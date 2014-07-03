@@ -13,6 +13,7 @@ include(${QT_USE_FILE})
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS  pluginlib roscpp std_msgs
+  LIBRARIES
   DEPENDS Eigen QT
 )
 
@@ -29,10 +30,16 @@ include_directories(
 
 add_library(GeotiffCreator src/GeotiffCreator.cpp)
 target_link_libraries(GeotiffCreator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies(GeotiffCreator ${catkin_EXPORTED_TARGETS})
+add_dependencies(GeotiffCreator  ${catkin_EXPORTED_TARGETS})
 
-#~ add_executable(geotiff_saver src/geotiff_saver.cpp)
-#~ target_link_libraries(geotiff_saver geotiff_writer)
-#~ add_dependencies(geotiff_saver ${catkin_EXPORTED_TARGETS})
+add_library( map_generator src/map_generator.cpp)
+target_link_libraries(map_generator  GeotiffCreator ${catkin_LIBRARIES} ${QT_LIBRARIES})
+add_dependencies( map_generator   GeotiffCreator${catkin_EXPORTED_TARGETS})
 
-
+add_executable(geotiff_node src/pandora_geotiff_node.cpp)
+target_link_libraries(geotiff_node   
+      ${catkin_LIBRARIES}
+      GeotiffCreator
+      map_generator
+      )
+add_dependencies(map_generator ${catkin_EXPORTED_TARGETS})

@@ -30,10 +30,10 @@
 
 QString homeFolderString("/home/konstantinos");
 
-GeotiffCreator::GeotiffCreator()
+GeotiffCreator::GeotiffCreator() 
 {
-   finalSizeX = 10 ;
-   finalSizeY = 10;
+   finalSizeX = 1000 ;
+   finalSizeY = 1000;
    onCreateGeotiffClicked();
 
 
@@ -50,33 +50,78 @@ void GeotiffCreator::geotiffTimerCb(const ros::TimerEvent& event){
 void GeotiffCreator::onCreateGeotiffClicked()
 {
   
+   ROS_ERROR("0");
   
-    QImage geotiff(finalSizeX,finalSizeY, QImage::Format_RGB32);
-    QPainter geotiffPainter;
-    geotiffPainter.begin(&geotiff);
+  int xsize = 200;
+  int ysize = 200;
+  QImage mapIm(xsize, ysize, QImage::Format_ARGB32);
+  QPainter mapPainter;
+  mapPainter.begin(&mapIm);
+  ROS_ERROR("1");
 
-    QColor colorLightGreyGrid;
-    QColor colorDarkGreyGrid;
-    colorLightGreyGrid.setRgb(226,226,227);
-    colorDarkGreyGrid.setRgb(237,237,238);
+  QTransform transform90DegTmp;
+  transform90DegTmp.rotate(-90);
+  QTransform transform90Deg = mapIm.trueMatrix(transform90DegTmp, 40, 40);
 
-    QBrush gridBrush(colorLightGreyGrid);
+    
+  mapIm = mapIm.transformed(transform90Deg);
+    
+  QImage geotiff(finalSizeX,finalSizeY, QImage::Format_RGB32);
+  
+  QPainter geotiffPainter;
+  geotiffPainter.begin(&geotiff);
 
-    //draw (checkerboard) grid
+  drawCheckers(finalSizeX, finalSizeY, &geotiffPainter);
+  drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
+  drawMapOrientation(finalSizeX, finalSizeY, &geotiffPainter);
+  drawMapScale(finalSizeX, finalSizeY, &geotiffPainter);
+  
+  int ioffset = 100;
+  int joffset = 100;
+
+  QPoint mapP(ioffset, joffset);
+  geotiffPainter.drawImage(mapP, mapIm);
+  
+  drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter, &geotiff);
+  
+  geotiffPainter.end();
+  
+  
+  
+   //save geotiff in Desktop
+   QString filepath = homeFolderString;
+   filepath = filepath.append("/Desktop/");
+   //~ filepath.append(filenameString);
+   geotiff.save("/home/konstantinos/Desktop/image.jpg");
+   ROS_ERROR("9");
+  }
+void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPainter) {
+  
+  
+
+  QColor colorLightGreyGrid;
+  QColor colorDarkGreyGrid;
+  colorLightGreyGrid.setRgb(226,226,227);
+  colorDarkGreyGrid.setRgb(237,237,238);
+
+  QBrush gridBrush(colorLightGreyGrid);
+    ROS_ERROR("3");
+     
+    //~ //draw (checkerboard) grid
     bool dark = true;
-        for (int i = 0; i < finalSizeX/50 ; i++) {
+        for (int i = 0; i < xsize/50 ; i++) {
           dark = !dark;
-          for (int j = 0; j < finalSizeY/50 ; j++) {
+          for (int j = 0; j < ysize/50 ; j++) {
               dark = !dark;
 
               if (dark) {
                   gridBrush.setColor(colorLightGreyGrid);
-                   geotiffPainter.setPen(colorLightGreyGrid);
+                   geotiffPainter->setPen(colorLightGreyGrid);
              } 
              else 
              {
                 gridBrush.setColor(colorDarkGreyGrid);
-                geotiffPainter.setPen(colorDarkGreyGrid);
+                geotiffPainter->setPen(colorDarkGreyGrid);
             }
  
             int x = 50 * i;
@@ -84,13 +129,117 @@ void GeotiffCreator::onCreateGeotiffClicked()
             int width = 50;
             int height = 50;
             // Draw rectangle to screen.
-            geotiffPainter.drawRect(x, y, width, height);
-            geotiffPainter.fillRect(x, y, width, height, gridBrush);
+            geotiffPainter->drawRect(x, y, width, height);
+            geotiffPainter->fillRect(x, y, width, height, gridBrush);
+            
           }
     }
-    //save geotiff in Desktop
-    QString filepath = homeFolderString;
-    filepath = filepath.append("/Desktop/");
-    //~ filepath.append(filenameString);
-    geotiff.save(filepath);
+}
+
+void GeotiffCreator::drawFileName( int xsize ,int ysize ,  QPainter* geotiffPainter ){
+  
+  
+   QColor colorBlueText;
+   colorBlueText.setRgb(0, 44, 207);
+   QPen filenamePen = QPen(colorBlueText);
+   filenamePen.setWidth(4);
+   geotiffPainter->setPen(filenamePen);
+
+   QPointF filenamePoint(25 ,25);
+   QString filenameString("/RRL_2013_PANDORA_");
+   //~ filenameString.append(missionName);
+   filenameString.append(".tiff");
+
+   QPen colorBlueTextPen(colorBlueText);
+   colorBlueTextPen.setWidth(2);
+   geotiffPainter->setPen(colorBlueTextPen);
+
+   geotiffPainter->drawText(filenamePoint, filenameString);
+}
+void GeotiffCreator::drawMapScale( int xsize ,int ysize ,  QPainter* geotiffPainter ){
+       QColor colorMapScale;
+   colorMapScale.setRgb(0, 50, 140);
+
+   QPen colorMapScalePen = QPen(colorMapScale);
+   colorMapScalePen.setWidth(4);
+   geotiffPainter->setPen(colorMapScalePen);
+
+   geotiffPainter->setPen(colorMapScale);
+   QPointF lengthUnitPoint1(25, 50);
+   QPointF lengthUnitPoint2(25, 100);
+
+   geotiffPainter->drawLine(lengthUnitPoint1, lengthUnitPoint2);
+
+   QPointF lengthUnitPoint1Up(21, 50);
+   QPointF lengthUnitPoint2Up(29, 50);
+   geotiffPainter->drawLine(lengthUnitPoint1Up, lengthUnitPoint2Up);
+
+   QPointF lengthUnitPoint1Down(21, 100);
+   QPointF lengthUnitPoint2Down(29, 100);
+   geotiffPainter->drawLine(lengthUnitPoint1Down, lengthUnitPoint2Down);
+
+   QPointF lengthUnitTextPoint(28, 80);
+   QString lengthUnitText("1m");
+   geotiffPainter->drawText(lengthUnitTextPoint, lengthUnitText);
+ }
+void GeotiffCreator::drawMapOrientation( int xsize ,int ysize , QPainter* geotiffPainter ){
+       QColor colorOrientation;
+   colorOrientation.setRgb(0, 50, 140);
+
+   QPointF pointX1(100, 50);
+   QPointF pointX2(100, 100);
+   QPointF pointY1(50, 100);
+   QPointF pointY2(100, 100);
+
+   geotiffPainter->drawLine(pointX1, pointX2);
+   geotiffPainter->drawLine(pointY1, pointY2);
+
+   QPointF pointYup(55, 95);
+   QPointF pointYdown(55, 105);
+   geotiffPainter->drawLine(pointY1, pointYup);
+   geotiffPainter->drawLine(pointY1, pointYdown);
+
+   QPointF pointXright(105, 55);
+   QPointF pointXleft(95, 55);
+   geotiffPainter->drawLine(pointX1, pointXright);
+   geotiffPainter->drawLine(pointX1, pointXleft);
+
+   QPointF pointXText(110, 52);
+   QString XString("x");
+   geotiffPainter->drawText(pointXText, XString);
+
+   QPointF pointYText(60, 93);
+   QString YString("y");
+   geotiffPainter->drawText(pointYText, YString);
+ }
+ 
+void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter, QImage* geotiff) {
+  QColor exploredAreaColor;
+  exploredAreaColor.setRgb(190,190,191);
+  QPen exploredAreaPen(exploredAreaColor);
+  geotiffPainter->setPen(exploredAreaPen);
+  
+  for(int i=0; i<ysize-50; i++){
+    for(int j=15; j<xsize-50; j+=25){
+      QRgb rgb = geotiff->pixel(i,j);
+      int r = qRed(rgb);
+      int g = qGreen(rgb);
+      int b = qBlue(rgb);
+      if( ((r==g)&&(g==b)&&(r>=140)) || ((g==230)&&(r==b)&&(r>=130)&&(r<=180)) ){
+        geotiffPainter->drawPoint(i,j);
+      }
+    }
   }
+
+  for(int i=15; i<xsize-50; i+=25){
+    for(int j=0; j<ysize-50; j++){
+      QRgb rgb = geotiff->pixel(i,j);
+        int r = qRed(rgb);
+        int g = qGreen(rgb);
+        int b = qBlue(rgb);
+        if( ((r==g)&&(g==b)&&(r>=140)) || ((g==230)&&(r==b)&&(r>=130)&&(r<=180)) ){
+          geotiffPainter->drawPoint(i,j);
+        }
+    }
+  }
+}

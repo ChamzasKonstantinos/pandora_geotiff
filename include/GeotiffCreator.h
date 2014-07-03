@@ -32,24 +32,29 @@
 class GeotiffCreator : public QWidget
 {
 
-    Q_OBJECT
+    //~ Q_OBJECT
 
 private:
-    QMutex _geoGuard;
+
 
     //~ void generateQrCsv();
 
     ros::NodeHandle _handle;
     QString missionName;
     void geotiffTimerCb(const ros::TimerEvent& event);
-    
+    void drawCheckers ( int xsize ,int ysize , QPainter* geotiffPainter); 
+    void drawFileName( int xsize ,int ysize , QPainter* geotiffPainter);
+    void drawMapScale( int xsize ,int ysize ,QPainter* geotiffPainter);
+    void drawMapOrientation( int xsize ,int ysize , QPainter* geotiffPainter);
+    void drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter, QImage* geotiff);
     int finalSizeX ;
     int finalSizeY ;
-    
 
 public:
     ///GeotiffCreator constructor
     GeotiffCreator();
+    ///GeotiffCreator destructor
+    ~GeotiffCreator() {  };
 
 public Q_SLOTS:
 
