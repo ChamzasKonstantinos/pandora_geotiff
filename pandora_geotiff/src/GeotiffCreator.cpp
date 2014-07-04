@@ -34,7 +34,6 @@ GeotiffCreator::GeotiffCreator()
 {
    finalSizeX = 1000 ;
    finalSizeY = 1000;
-   onCreateGeotiffClicked();
 
 
 }

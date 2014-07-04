@@ -66,7 +66,7 @@ private:
 
     QString missionName;
 
-    uchar *map;
+    unchar *map;
     uchar *coverage;
     int xsize;
     int ysize;

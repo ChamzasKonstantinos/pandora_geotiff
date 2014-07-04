@@ -8,7 +8,7 @@ int main(int argc, char **argv){
   ROS_INFO("PANDORA_GEOTIFF_NODE_STARTED");
   QApplication a(argc, argv);
   MapGenerator gc;
-  ROS_INFO("PANDORA_");
+  gc.writeGeotiff();
   ros::spin();
 
 }

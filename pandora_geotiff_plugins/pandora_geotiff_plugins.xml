@@ -1,0 +1,7 @@
+<library path="lib/libpandora_geotiff_plugins">
+  <class name="pandora_geotiff_plugins/MapCoverageWriter" type="pandora_geotiff_plugins::MapCoverageWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a MapCoverage plugin that draws the map and the coverage.
+    </description>
+  </class>
+</library>

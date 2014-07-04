@@ -38,11 +38,10 @@ class MapWriterPluginInterface{
 public:
 
   virtual void initialize(const std::string& name) = 0;
-  //~ virtual void draw(MapWriterInterface* map_writer_interface) = 0;
-  virtual void getGeotiffData() = 0;
+  virtual void draw(MapWriterInterface* map_writer_interface) = 0;
 
 };
 
-} //namespace hector_geotiff
+} //namespace pandora_geotiff
 
 #endif

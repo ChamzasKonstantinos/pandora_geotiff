@@ -25,8 +25,6 @@ private:
   
   std::string p_plugin_list_;
   ros::NodeHandle pn_;
-  
-  
   std::vector<boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> > plugin_vector_;
   pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>* plugin_loader_;
   

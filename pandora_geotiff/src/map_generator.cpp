@@ -10,11 +10,12 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
 
     //We always have at least one element containing "" in the string list
     if ((plugin_list.size() > 0) && (plugin_list[0].length() > 0)){
-      plugin_loader_ = new pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>("pandora_geotiff", "pandora_geotiff::MapWriterPluginInterface");
+      plugin_loader_ = new pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>(
+      "pandora_geotiff", "pandora_geotiff::MapWriterPluginInterface");
 
       for (size_t i = 0; i < plugin_list.size(); ++i){
         try
-        {
+        { 
           boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> tmp (plugin_loader_->createInstance(plugin_list[i]));
           tmp->initialize(plugin_loader_->getName(plugin_list[i]));
           plugin_vector_.push_back(tmp);
@@ -41,21 +42,13 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
   void MapGenerator::writeGeotiff()
   {
     ros::Time start_time (ros::Time::now());
-    //~ geotiffBaseCreator.drawCheckers();
-    //~ geotiffBaseCreator.drawMapScale();
-    //~ geotiffBaseCreator.drawMapOrientation();
-    //~ geotiffBaseCreator.drawExploredArea();
-
-
-      //ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    geotiffCreator->onCreateGeotiffClicked();
+ 
+    for (size_t i = 0; i < plugin_vector_.size(); ++i){
+      plugin_vector_[i]->draw(geotiffCreator);
     }
-    //~ else
-    
-    //~ for (size_t i = 0; i < plugin_vector_.size(); ++i){
-      //~ plugin_vector_[i]->draw(&geotiff_writer_);
-    //~ }
+}
 
-    //~ geotiff_writer_.writeGeotiffImage();
 
     //~ ros::Duration elapsed_time (ros::Time::now() - start_time);
 

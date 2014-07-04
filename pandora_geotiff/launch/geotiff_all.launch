@@ -2,9 +2,14 @@
 
 <launch>
   
-   <param name="plugins" type="string"
-    value="pandora_geotiff_plugins/TrajectoryMapWriter" />
+  
+    
+    
   <node pkg="pandora_geotiff" type="geotiff_node" name="pandora_geotiff_node" output="screen" >
+    
+    
+     <param name="plugins" type="string"
+    value="pandora_geotiff_plugins/MapCoverageWriter" />
     
   </node>
 

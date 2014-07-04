@@ -24,12 +24,13 @@
 #define GeotiffCreator_H
 
 
+#include "map_writer_interface.h"
 #include "ros/ros.h"
 #include <ros/callback_queue.h>
 #include <QtGui>
 #include <QAction>
 
-class GeotiffCreator : public QWidget
+class GeotiffCreator : public MapWriterInterface
 {
 
     //~ Q_OBJECT
