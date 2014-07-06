@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_geotiff)
-find_package(catkin REQUIRED COMPONENTS cmake_modules pluginlib roscpp std_msgs)
+find_package(catkin REQUIRED COMPONENTS cmake_modules pluginlib roscpp std_msgs message_generation)
 
-find_package(Qt4 4.6 COMPONENTS QtCore QtGui REQUIRED)
+find_package(Qt4 4.6 COMPONENTS QtCore QtGui  REQUIRED)
 
 find_package(Eigen REQUIRED)
 include_directories(${Eigen_INCLUDE_DIRS})
@@ -10,12 +10,26 @@ add_definitions(${Eigen_DEFINITIONS})
 
 include(${QT_USE_FILE})
 
+
+
+add_service_files(
+   FILES
+   SaveMission.srv
+ )
+ 
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+)
+
 catkin_package(
   INCLUDE_DIRS include
   CATKIN_DEPENDS  pluginlib roscpp std_msgs
   LIBRARIES
   DEPENDS Eigen QT
 )
+
+
 
 ###########
 ## Build ##

@@ -34,14 +34,9 @@ GeotiffCreator::GeotiffCreator()
 {
    finalSizeX = 1000 ;
    finalSizeY = 1000;
+   
+  geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
 
-
-}
-
-void GeotiffCreator::geotiffTimerCb(const ros::TimerEvent& event){
-
-//~ calling geotiff services and storing data in corresponding arrays
-   //~ getGeotiffData();
 
 }
 
@@ -65,35 +60,31 @@ void GeotiffCreator::onCreateGeotiffClicked()
     
   mapIm = mapIm.transformed(transform90Deg);
     
-  QImage geotiff(finalSizeX,finalSizeY, QImage::Format_RGB32);
+  
   
   QPainter geotiffPainter;
-  geotiffPainter.begin(&geotiff);
+  geotiffPainter.begin(geotiff_);
 
   drawCheckers(finalSizeX, finalSizeY, &geotiffPainter);
   drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapOrientation(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapScale(finalSizeX, finalSizeY, &geotiffPainter);
   
-  int ioffset = 100;
-  int joffset = 100;
+  drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter);
 
-  QPoint mapP(ioffset, joffset);
-  geotiffPainter.drawImage(mapP, mapIm);
+   
+  }
   
-  drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter, &geotiff);
-  
-  geotiffPainter.end();
-  
-  
-  
-   //save geotiff in Desktop
+void GeotiffCreator::saveGeotiff()
+{
+  //save geotiff_ in Desktop
    QString filepath = homeFolderString;
    filepath = filepath.append("/Desktop/");
    //~ filepath.append(filenameString);
-   geotiff.save("/home/konstantinos/Desktop/image.jpg");
+   (*geotiff_).save("/home/konstantinos/Desktop/image.jpg");
    ROS_ERROR("9");
-  }
+}
+
 void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPainter) {
   
   
@@ -212,7 +203,8 @@ void GeotiffCreator::drawMapOrientation( int xsize ,int ysize , QPainter* geotif
    geotiffPainter->drawText(pointYText, YString);
  }
  
-void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter, QImage* geotiff) {
+void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter) {
+
   QColor exploredAreaColor;
   exploredAreaColor.setRgb(190,190,191);
   QPen exploredAreaPen(exploredAreaColor);
@@ -220,7 +212,7 @@ void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffP
   
   for(int i=0; i<ysize-50; i++){
     for(int j=15; j<xsize-50; j+=25){
-      QRgb rgb = geotiff->pixel(i,j);
+      QRgb rgb = geotiff_->pixel(i,j);
       int r = qRed(rgb);
       int g = qGreen(rgb);
       int b = qBlue(rgb);
@@ -232,7 +224,7 @@ void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffP
 
   for(int i=15; i<xsize-50; i+=25){
     for(int j=0; j<ysize-50; j++){
-      QRgb rgb = geotiff->pixel(i,j);
+      QRgb rgb = geotiff_->pixel(i,j);
         int r = qRed(rgb);
         int g = qGreen(rgb);
         int b = qBlue(rgb);
@@ -241,4 +233,68 @@ void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffP
         }
     }
   }
+}
+
+
+void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
+{
+
+  QPainter geotiffPainter;
+  geotiffPainter.begin(geotiff_);
+  
+  
+  int xsize = map->info.height;
+  int ysize = map->info.width;
+  
+  
+  ROS_ERROR("SIZEX:%d",xsize);
+  ROS_ERROR("SIZEX:%d",ysize);
+  
+  finalSizeY = (xsize/100)*100 +200;
+  finalSizeX = (ysize/100)*100 +200;
+  //~ 
+  QImage mapIm(xsize, ysize, QImage::Format_ARGB32);
+  QPainter mapPainter;
+  mapPainter.begin(&mapIm);
+  
+  
+  //~ QTransform transform90DegTmp;
+  //~ transform90DegTmp.rotate(-90);
+  //~ QTransform transform90Deg = mapIm.trueMatrix(transform90DegTmp, 40, 40);
+    
+  //~ mapIm = mapIm.transformed(transform90Deg);
+  ROS_ERROR("10");
+  mapPainter.setCompositionMode(QPainter::CompositionMode_Source);
+  mapPainter.fillRect(mapIm.rect(), Qt::transparent);
+  mapPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  ROS_ERROR("11");
+
+  QColor wallsObstaclesColor;
+  wallsObstaclesColor.setRgb(0, 40, 120);
+
+  for(int i=0; i<xsize; i++){
+    for(int j=0; j<ysize; j++){
+      if(map->data[j*xsize + i] < 127 && map->data[j*xsize + i] > 0){
+
+        QPen wallsObstaclesPen(wallsObstaclesColor);
+        wallsObstaclesPen.setWidth(3);
+        mapPainter.setPen(wallsObstaclesPen);
+        mapPainter.drawPoint(i,ysize-1-j);
+      }
+      else if(map->data[j*xsize + i] > 126 ){
+       QColor searchedAreaColor;
+       searchedAreaColor.setRgb(map->data[j*xsize + i], map->data[j*xsize + i], map->data[j*xsize + i]);
+       mapPainter.setPen(searchedAreaColor);
+       mapPainter.drawPoint(i,ysize-1-j);
+      }
+    }
+  }
+  
+  
+      
+   int ioffset = 100;
+   int joffset = 100;
+
+   QPoint mapP(ioffset, joffset);
+   geotiffPainter.drawImage(mapP, mapIm);
 }

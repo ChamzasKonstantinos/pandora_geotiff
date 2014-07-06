@@ -31,7 +31,7 @@
 
 #include <vector>
 #include <Eigen/Core>
-
+#include <nav_msgs/OccupancyGrid.h>
 
 class MapWriterInterface{
 public:
@@ -39,8 +39,8 @@ public:
     Color(unsigned int r, unsigned int g, unsigned int b) : r(r), g(g), b(b) {}
     unsigned int r,g,b;
   };
-
-  //~ virtual std::string getBasePathAndFileName() const = 0;
+  
+  virtual void drawMap(const nav_msgs::OccupancyGrid *map) = 0;
   //~ virtual void drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& txt, const Color& color) = 0;
   //~ virtual void drawPath(const Eigen::Vector3f& start, const std::vector<Eigen::Vector2f>& points) = 0;
 };

@@ -899,7 +899,7 @@ QString YString("y");
 geotiffPainter.drawText(pointYText, YString);
     
     
-    int ioffset = 100;
+int ioffset = 100;
 int joffset = 100;
 
 QPoint mapP(ioffset, joffset);

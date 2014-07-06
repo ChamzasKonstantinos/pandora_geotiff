@@ -43,13 +43,24 @@ private:
     ros::NodeHandle _handle;
     QString missionName;
     void geotiffTimerCb(const ros::TimerEvent& event);
+
     void drawCheckers ( int xsize ,int ysize , QPainter* geotiffPainter); 
     void drawFileName( int xsize ,int ysize , QPainter* geotiffPainter);
     void drawMapScale( int xsize ,int ysize ,QPainter* geotiffPainter);
     void drawMapOrientation( int xsize ,int ysize , QPainter* geotiffPainter);
-    void drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter, QImage* geotiff);
+    void drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter );
+    
+    
+    virtual void drawMap(const nav_msgs::OccupancyGrid* map);
+    
+     
     int finalSizeX ;
     int finalSizeY ;
+    
+    
+    QImage* geotiff_;
+    
+    
 
 public:
     ///GeotiffCreator constructor
@@ -57,24 +68,9 @@ public:
     ///GeotiffCreator destructor
     ~GeotiffCreator() {  };
 
-public Q_SLOTS:
-
-    /** A Qt SLOT-function which is called when the createGeotiffPushButton button is pressed
-*
-* it calls the necessary services to obtain the map related information, paints the map
-* on a qimage and stores it in a file on the disk.
-*
-*/
     void onCreateGeotiffClicked();
+    void saveGeotiff();
 
-    /** A Qt SLOT-function which is called when the geotiffMissionNamePlainTextEdit's text is changed
-*
-* it stores the desired mission name on a local variable in order to be used for
-* the geotif's filename
-*
-* \param[in] textInserted the mission name typed by the operator
-*/
-    //~ void saveMissionName(const QString & textInserted);
 };
 
 

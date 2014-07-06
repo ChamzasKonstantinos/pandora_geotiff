@@ -28,10 +28,11 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
     }else{
       ROS_INFO("No plugins loaded for geotiff node");
     }
+    
+    save_mission_service = pn_.advertiseService("saveMission",&MapGenerator::saveGeotiff,this);
 
     ROS_INFO("Geotiff node started");
   }
-
  MapGenerator::~MapGenerator()
   {
     if (plugin_loader_){
@@ -41,20 +42,21 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
 
   void MapGenerator::writeGeotiff()
   {
-    ros::Time start_time (ros::Time::now());
     geotiffCreator->onCreateGeotiffClicked();
  
     for (size_t i = 0; i < plugin_vector_.size(); ++i){
       plugin_vector_[i]->draw(geotiffCreator);
     }
+    
+    geotiffCreator->saveGeotiff();
 }
 
-
-    //~ ros::Duration elapsed_time (ros::Time::now() - start_time);
-
-    //~ ROS_INFO("GeoTiff created in %f seconds", elapsed_time.toSec());
-
-  void MapGenerator::timerSaveGeotiffCallback(const ros::TimerEvent& e)
+  bool MapGenerator::saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
+    pandora_geotiff::SaveMission::Response& res )
   {
+    ROS_ERROR("SUCCESS");
+    
     this->writeGeotiff();
+    //~ res.success = 1;
+    return true;
   }
