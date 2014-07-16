@@ -42,14 +42,25 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
 
   void MapGenerator::writeGeotiff()
   {
-    geotiffCreator->onCreateGeotiffClicked();
- 
+   
+   
+    
     for (size_t i = 0; i < plugin_vector_.size(); ++i){
       plugin_vector_[i]->draw(geotiffCreator);
     }
     
+    geotiffCreator->onCreateGeotiffClicked();
+    geotiffCreator->inCreateGeotiffClicked();
+    
     geotiffCreator->saveGeotiff();
 }
+
+
+  void MapGenerator::saveMissionName(std::string missionName)
+{
+   geotiffCreator->saveMissionName(missionName);
+  
+  }
 
   bool MapGenerator::saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
     pandora_geotiff::SaveMission::Response& res )
@@ -57,6 +68,6 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
     ROS_ERROR("SUCCESS");
     
     this->writeGeotiff();
-    //~ res.success = 1;
+    this->saveMissionName(req.SaveMisionFileName.c_str());
     return true;
   }

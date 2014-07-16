@@ -4,7 +4,7 @@
 
 #include <ros/ros.h>
 #include <pluginlib/class_loader.h>
-#include <fstream>
+
 
 namespace pandora_geotiff_plugins
 {
@@ -19,12 +19,13 @@ public:
 
   virtual void initialize(const std::string& name);
   virtual void draw(MapWriterInterface *interface);
-  void getGeotiffData(nav_msgs::OccupancyGrid map);
+  void getGeotiffDataMap(nav_msgs::OccupancyGrid map);
+  void getGeotiffDataCoverage(nav_msgs::OccupancyGrid map);
 
 protected:
   ros::NodeHandle nh_;
   ros::Subscriber map_sub;
-  ros::Subscriber map_coverage_sub;
+  ros::Subscriber map_sub_coverage;
 
   bool initialized_;
   std::string name_;
@@ -34,6 +35,7 @@ protected:
   
 private:
    nav_msgs::OccupancyGrid map;
+   nav_msgs::OccupancyGrid coverage;
 
    bool gotData;
 };
@@ -54,17 +56,25 @@ void MapCoverageWriter::initialize(const std::string& name)
   plugin_nh.param("/published_topic_names/coverage_map", map_coverage_topic_name_, std::string("/data_fusion/sensor_coverage/coverage_map"));
   
 
-  map_sub = plugin_nh.subscribe(map_topic_name_, 1000,  &MapCoverageWriter::getGeotiffData,this);
-  //~ map_coverage_sub = plugin_nh.subscribe(map_coverage_topic_name_, 1000,  &MapCoverageWriter::getGeotiffData,this);
+  map_sub = plugin_nh.subscribe(map_topic_name_,
+       1000,  &MapCoverageWriter::getGeotiffDataMap,this);
+       
+  map_sub_coverage = plugin_nh.subscribe(map_coverage_topic_name_,
+       1000,  &MapCoverageWriter::getGeotiffDataCoverage,this);
+       
   initialized_ = true;
   this->name_ = name;
   ROS_INFO_NAMED(name_, "Successfully initialized pandora_geotiff MapCoverageWriter plugin %s.", name_.c_str());
 }
 
-void MapCoverageWriter::getGeotiffData(nav_msgs::OccupancyGrid map)
+void MapCoverageWriter::getGeotiffDataMap(nav_msgs::OccupancyGrid map)
 {
   this->map = map;
+}
 
+void MapCoverageWriter::getGeotiffDataCoverage(nav_msgs::OccupancyGrid coverage)
+{
+  this->coverage = coverage;
 }
   
 void MapCoverageWriter::draw(MapWriterInterface *interface)
@@ -72,8 +82,8 @@ void MapCoverageWriter::draw(MapWriterInterface *interface)
     if(!initialized_) return;
 
     ROS_ERROR("Drawing the awesome map");
-    
     interface->drawMap(&map);
+    interface->drawMap(&coverage);
 }
 
 } 

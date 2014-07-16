@@ -9,7 +9,7 @@
     
     
      <param name="plugins" type="string"
-    value="pandora_geotiff_plugins/MapCoverageWriter" />
+    value="pandora_geotiff_plugins/MapCoverageWriter pandora_geotiff_plugins/PathWriter pandora_geotiff_plugins/ObjectsWriter"/>
     
   </node>
 

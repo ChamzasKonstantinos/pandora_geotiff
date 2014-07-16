@@ -30,38 +30,104 @@
 
 QString homeFolderString("/home/konstantinos");
 
+
+
+std::string getDateAndTime(){
+
+time_t t = time(0); // get time now
+struct tm * now = localtime( & t );
+char buf[20];
+std::stringstream ss;
+
+strftime(buf, sizeof(buf), "%F", now);
+
+ss << buf << "; ";
+
+strftime(buf, sizeof(buf), "%T", now);
+
+ss << buf;
+
+std::string str = ss.str();
+
+    return str;
+
+}
+
+std::string getQrTime(time_t qrTime){
+
+struct tm * now = localtime( & qrTime );
+char buf[10];
+std::stringstream ss;
+strftime(buf, sizeof(buf), "%T", now);
+ss << buf;
+
+std::string str = ss.str();
+
+    return str;
+}
+
 GeotiffCreator::GeotiffCreator() 
 {
-   finalSizeX = 1000 ;
-   finalSizeY = 1000;
-   
+
   geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
+  mapIm_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
 
 
 }
 
 
+//~ void GeotiffCreator::generateQrCsv(){
+//~ 
+//~ QString filenameString("/RC_2014_PANDORA_");
+//~ filenameString.append(missionName);
+//~ filenameString.append("_qr.csv");
+//~ 
+//~ QString filepath = homeFolderString;
+//~ filepath = filepath.append("/Desktop/");
+//~ filepath.append(filenameString);
+//~ std::string filepathStr = filepath.toUtf8().constData();
+//~ 
+//~ std::cout << filepathStr << "\n";
+//~ 
+//~ std::ofstream csvFile;
+//~ csvFile.open (filepathStr.c_str());
+//~ 
+//~ // ---csvFile---
+//~ // Resko Koblenz, Germany
+//~ // 2013-06-23; 14:37:03
+//~ // Semi1
+//~ //
+//~ // 1;14:28:01;Y_1_1_chair_yoked;-8.29994;-2.29014
+//~ 
+//~ csvFile << "PANDORA AUTh, Greece" << std::endl;
+//~ csvFile << getDateAndTime() << std::endl;
+//~ csvFile << missionName.toUtf8().constData() << std::endl << std::endl;
+//~ std::string qrWorldTime[qrSize];
+//~ 
+
+
+//~ for(int i=0; i<qrSize; i++){
+//~ qrWorldTime[i] = getQrTime(qrTime[i]);
+//~ }
+//~ 
+//~ for(int i=0; i<qrSize; i++)
+//~ csvFile << i+1 << ";" << qrWorldTime[i] << ";" << qrType[i] << ";" << qrWorldX[i] << ";" << qrWorldY[i] << std::endl;
+//~ 
+//~ 
+//~ csvFile.close();
+//~ 
+//~ }
+
+
+void GeotiffCreator::saveMissionName(std::string missionName)
+{
+  this->missionName = QString::fromStdString(missionName);
+  
+}
+
+
 void GeotiffCreator::onCreateGeotiffClicked()
 {
-  
-   ROS_ERROR("0");
-  
-  int xsize = 200;
-  int ysize = 200;
-  QImage mapIm(xsize, ysize, QImage::Format_ARGB32);
-  QPainter mapPainter;
-  mapPainter.begin(&mapIm);
-  ROS_ERROR("1");
-
-  QTransform transform90DegTmp;
-  transform90DegTmp.rotate(-90);
-  QTransform transform90Deg = mapIm.trueMatrix(transform90DegTmp, 40, 40);
-
-    
-  mapIm = mapIm.transformed(transform90Deg);
-    
-  
-  
   QPainter geotiffPainter;
   geotiffPainter.begin(geotiff_);
 
@@ -69,11 +135,22 @@ void GeotiffCreator::onCreateGeotiffClicked()
   drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapOrientation(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapScale(finalSizeX, finalSizeY, &geotiffPainter);
+
+  }
+  
+void GeotiffCreator::inCreateGeotiffClicked()
+{
+  QPainter geotiffPainter;
+  geotiffPainter.begin(geotiff_);
+  
+  int ioffset = 100;
+  int joffset = 100;
+
+  QPoint mapP(ioffset, joffset);
+  geotiffPainter.drawImage(mapP, *mapIm_);
   
   drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter);
-
-   
-  }
+}
   
 void GeotiffCreator::saveGeotiff()
 {
@@ -82,12 +159,9 @@ void GeotiffCreator::saveGeotiff()
    filepath = filepath.append("/Desktop/");
    //~ filepath.append(filenameString);
    (*geotiff_).save("/home/konstantinos/Desktop/image.jpg");
-   ROS_ERROR("9");
 }
 
 void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPainter) {
-  
-  
 
   QColor colorLightGreyGrid;
   QColor colorDarkGreyGrid;
@@ -95,25 +169,21 @@ void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPai
   colorDarkGreyGrid.setRgb(237,237,238);
 
   QBrush gridBrush(colorLightGreyGrid);
-    ROS_ERROR("3");
-     
-    //~ //draw (checkerboard) grid
+    //draw (checkerboard) grid
     bool dark = true;
         for (int i = 0; i < xsize/50 ; i++) {
           dark = !dark;
           for (int j = 0; j < ysize/50 ; j++) {
               dark = !dark;
-
               if (dark) {
                   gridBrush.setColor(colorLightGreyGrid);
                    geotiffPainter->setPen(colorLightGreyGrid);
-             } 
+              } 
              else 
              {
                 gridBrush.setColor(colorDarkGreyGrid);
                 geotiffPainter->setPen(colorDarkGreyGrid);
             }
- 
             int x = 50 * i;
             int y = 50 * j;
             int width = 50;
@@ -137,7 +207,7 @@ void GeotiffCreator::drawFileName( int xsize ,int ysize ,  QPainter* geotiffPain
 
    QPointF filenamePoint(25 ,25);
    QString filenameString("/RRL_2013_PANDORA_");
-   //~ filenameString.append(missionName);
+   filenameString.append(missionName);
    filenameString.append(".tiff");
 
    QPen colorBlueTextPen(colorBlueText);
@@ -239,10 +309,6 @@ void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffP
 void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
 {
 
-  QPainter geotiffPainter;
-  geotiffPainter.begin(geotiff_);
-  
-  
   int xsize = map->info.height;
   int ysize = map->info.width;
   
@@ -252,22 +318,15 @@ void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
   
   finalSizeY = (xsize/100)*100 +200;
   finalSizeX = (ysize/100)*100 +200;
-  //~ 
-  QImage mapIm(xsize, ysize, QImage::Format_ARGB32);
+  
+  mapIm_ = new QImage(xsize, ysize, QImage::Format_ARGB32);
   QPainter mapPainter;
-  mapPainter.begin(&mapIm);
-  
-  
-  //~ QTransform transform90DegTmp;
-  //~ transform90DegTmp.rotate(-90);
-  //~ QTransform transform90Deg = mapIm.trueMatrix(transform90DegTmp, 40, 40);
-    
-  //~ mapIm = mapIm.transformed(transform90Deg);
-  ROS_ERROR("10");
+  mapPainter.begin(mapIm_);
+
   mapPainter.setCompositionMode(QPainter::CompositionMode_Source);
-  mapPainter.fillRect(mapIm.rect(), Qt::transparent);
+  mapPainter.fillRect(mapIm_->rect(), Qt::transparent);
   mapPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-  ROS_ERROR("11");
+
 
   QColor wallsObstaclesColor;
   wallsObstaclesColor.setRgb(0, 40, 120);
@@ -289,12 +348,94 @@ void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
       }
     }
   }
-  
-  
-      
-   int ioffset = 100;
-   int joffset = 100;
-
-   QPoint mapP(ioffset, joffset);
-   geotiffPainter.drawImage(mapP, mapIm);
 }
+
+void GeotiffCreator::drawPath(const Eigen::Vector3f& start, const std::vector<Eigen::Vector2f>& points)
+{
+  QPainter mapPainter;
+  mapPainter.begin(mapIm_);
+
+  int robotx = points[0].x();
+  int roboty = points[0].y();
+  QColor initPoseColor;
+  initPoseColor.setRgb(255, 200, 0);
+  QPen initPosePen(initPoseColor); 
+  mapPainter.setPen(initPosePen);
+  QBrush initPoseBrush(initPoseColor);
+  mapPainter.setBrush(initPoseBrush);
+  QPoint *initPosePoints = new QPoint[5];
+  initPosePoints[0].setX(robotx+15);
+  initPosePoints[0].setY(roboty);
+  initPosePoints[1].setX(robotx-10);
+  initPosePoints[1].setY(roboty-5);
+  initPosePoints[2].setX(robotx-5);
+  initPosePoints[2].setY(roboty);
+  initPosePoints[3].setX(robotx-10);
+  initPosePoints[3].setY(roboty+5);
+  mapPainter.drawPolygon(initPosePoints, 4);
+
+  QColor pathColor;
+  pathColor.setRgb(120,0,140);
+  QPen pathPen(pathColor);
+  pathPen.setWidth(2);
+  mapPainter.setPen(pathPen);
+
+  for(int i=0; i<points.size()-1; i++){
+   mapPainter.drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
+  }
+}
+
+
+void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& txt, const Color& color)
+{
+
+    QPainter mapPainter;
+    mapPainter.begin(mapIm_);
+
+    QImage objectIm(40, 40, QImage::Format_ARGB32);
+    QPainter objectPainter;
+
+    QColor objectColor;
+    objectColor.setRgb(color.r,color.g,color.b);
+
+    objectPainter.begin(&objectIm);
+
+    objectPainter.setCompositionMode(QPainter::CompositionMode_Source);
+    objectPainter.fillRect(objectIm.rect(), Qt::transparent); 
+    objectPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+
+    objectPainter.setPen(objectColor);
+
+    int x = 20;
+    int y = 20;
+
+    for(int iter=0; iter<10; iter++){
+      for(int k=x-iter; k<=x+iter; k++){
+        objectPainter.drawPoint(k, y-(10-iter));
+      }
+    }
+    for(int iter=0; iter<=10; iter++){
+      for(int k=x-iter; k<=x+iter; k++){
+        objectPainter.drawPoint(k, y+(10-iter));
+        }
+    }
+
+    QPen penWhite(Qt::white);
+    penWhite.setWidth(2);
+    objectPainter.setPen(penWhite);
+    objectPainter.drawText(x-4, y+5, QString::fromStdString(txt));
+    objectPainter.end();
+
+    QPoint ObjectPoint(coords.x(), coords.y());
+    mapPainter.drawImage(ObjectPoint, objectIm); 
+}
+
+
+
+
+
+
+
+
+
+

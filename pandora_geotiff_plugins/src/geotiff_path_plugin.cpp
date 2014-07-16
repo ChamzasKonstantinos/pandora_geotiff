@@ -26,13 +26,13 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //=================================================================================================
 
-#include <pandora_geotiff/map_writer_interface.h>
-#include <pandora_geotiff/map_writer_plugin_interface.h>
+#include <map_writer_interface.h>
+#include <map_writer_plugin_interface.h>
+#include <nav_msgs/Path.h>
 
 #include <ros/ros.h>
-
 #include <pluginlib/class_loader.h>
-#include <fstream>
+
 
 namespace pandora_geotiff_plugins
 {
@@ -47,23 +47,21 @@ public:
 
   virtual void initialize(const std::string& name);
   virtual void draw(MapWriterInterface *interface);
-  virtual void getGeotiffData();
+  void getRobotTrajectoryData(nav_msgs::Path robotPath);
 
 protected:
   ros::NodeHandle nh_;
-  ros::ServiceClient service_client_;
+  ros::Subscriber path_sub;
 
   bool initialized_;
   std::string name_;
   bool draw_all_objects_;
   std::string class_id_;
-  
-  
-private:
 
-  int *pathx;
-  int *pathy;
-  int pathSize;
+private:
+  
+  bool gotData;
+  nav_msgs::Path robotPath;
 
 };
 
@@ -77,39 +75,57 @@ PathWriter::~PathWriter()
 void PathWriter::initialize(const std::string& name)
 {
   ros::NodeHandle plugin_nh("~/" + name);
-  std::string service_name_;
+  std::string path_topic_name;
 
-  plugin_nh.param("service_name", service_name_, std::string("Path"));
-
-  service_client_ = nh_.serviceClient<pandora_nav_msgs::GetRobotPath>(service_name_);
-
+  plugin_nh.param("robot_trajector_topic", path_topic_name, std::string("/robot_trajectory"));
+  
+  path_sub = plugin_nh.subscribe(path_topic_name , 1000, &PathWriter::getRobotTrajectoryData,this);
   initialized_ = true;
   this->name_ = name;
-  ROS_INFO_NAMED(name_, "Successfully initialized pandora_geotiff MapWriter plugin %s.", name_.c_str());
+  ROS_INFO_NAMED(name_, "Successfully initialized pandora_geotiff PathWriter plugin %s.", name_.c_str());
 }
 
-PathWriter::getGeotiffData():
+void PathWriter::getRobotTrajectoryData(nav_msgs::Path robotPath)
 {
- pandora_nav_msgs::GetRobotPath path_srv;
-    if (!service_client_.call(path_srv)) {
-      ROS_ERROR_NAMED(name_, "Cannot draw Map, service %s failed", service_client_.getService().c_str());
-      return;
+  this->robotPath = robotPath;
+  ROS_INFO("DATA_PATH_RECEIVED");
+  
     }
-}
+
   
 void PathWriter::draw(MapWriterInterface *interface)
 {
     if(!initialized_) return;
+    
+    ROS_INFO("DRAWING THE AWESOME PATH");
+    
+    std::vector<geometry_msgs::PoseStamped>& path_vector (robotPath.poses);
 
-    QColor pathColor;
-    pathColor.setRgb(120,0,140);
-    QPen pathPen(pathColor);
-    pathPen.setWidth(2);
-    mapPainter.setPen(pathPen);
+    size_t size = path_vector.size();
 
-for(int i=0; i<pathSize-1; i++){
-  mapPainter.drawLine(pathx[i], ysize-1-pathy[i], pathx[i+1], ysize-1-pathy[i+1]);
-  }
+    std::vector<Eigen::Vector2f> pointVec;
+    pointVec.resize(size);
+    
+    ROS_INFO("%ld ", size);
+
+
+    for (size_t i = 0; i < size; ++i){
+      const geometry_msgs::PoseStamped& pose (path_vector[i]);
+
+      pointVec[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
+    }
+
+    if (size > 0){
+      Eigen::Vector3f startVec(pointVec[0].x(),pointVec[0].y(),0.0f);
+      interface->drawPath(startVec, pointVec);
+    }
+    ROS_INFO("DRAWED THE AWESOME PATH SUCCESFULLY");
+    
+
+
+   
+
+
 }
 
 } // namespace

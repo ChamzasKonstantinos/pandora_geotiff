@@ -28,6 +28,7 @@ private:
   ros::ServiceServer save_mission_service;
   std::vector<boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> > plugin_vector_;
   pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>* plugin_loader_;
+  void saveMissionName(std::string missionName);
   
 public:
   MapGenerator();

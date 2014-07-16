@@ -33,7 +33,6 @@
 class GeotiffCreator : public MapWriterInterface
 {
 
-    //~ Q_OBJECT
 
 private:
 
@@ -49,9 +48,12 @@ private:
     void drawMapScale( int xsize ,int ysize ,QPainter* geotiffPainter);
     void drawMapOrientation( int xsize ,int ysize , QPainter* geotiffPainter);
     void drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter );
+    void generateQrCsv(){}
     
     
     virtual void drawMap(const nav_msgs::OccupancyGrid* map);
+    virtual void drawPath(const Eigen::Vector3f& start, const std::vector<Eigen::Vector2f>& points);
+    virtual void drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& txt, const Color& color);
     
      
     int finalSizeX ;
@@ -59,6 +61,7 @@ private:
     
     
     QImage* geotiff_;
+    QImage* mapIm_;
     
     
 
@@ -69,7 +72,9 @@ public:
     ~GeotiffCreator() {  };
 
     void onCreateGeotiffClicked();
+    void inCreateGeotiffClicked();
     void saveGeotiff();
+    void saveMissionName(std::string missionName);
 
 };
 

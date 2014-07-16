@@ -4,4 +4,14 @@
       This is a MapCoverage plugin that draws the map and the coverage.
     </description>
   </class>
+   <class name="pandora_geotiff_plugins/PathWriter" type="pandora_geotiff_plugins::PathWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a Path plugin that draws the path the robot walked into.
+    </description>
+  </class>
+   <class name="pandora_geotiff_plugins/ObjectsWriter" type="pandora_geotiff_plugins::ObjectsWriter" base_class_type="pandora_geotiff::MapWriterPluginInterface">
+    <description>
+      This is a Path plugin that draws the path the robot walked into.
+    </description>
+  </class>
 </library>

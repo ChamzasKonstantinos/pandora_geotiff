@@ -24,6 +24,8 @@ include_directories(
 
 add_library(pandora_geotiff_plugins
   src/geotiff_map_coverage_plugin.cpp
+  src/geotiff_path_plugin.cpp
+  src/geotiff_objects_plugin.cpp
 )
 add_dependencies(pandora_geotiff_plugins   ${catkin_EXPORTED_TARGETS})
 ## Specify libraries to link a library or executable target against
