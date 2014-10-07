@@ -141,6 +141,7 @@ void ObjectsWriter::draw(MapWriterInterface *interface)
 {
     if(!initialized_) return;
     ROS_INFO("DRAWING THE AWESOME OBJECTS");
+    return;
 
     Eigen::Vector2f coords;
     std::string txt;

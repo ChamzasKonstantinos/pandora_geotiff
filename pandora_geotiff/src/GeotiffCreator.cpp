@@ -69,8 +69,14 @@ std::string str = ss.str();
 GeotiffCreator::GeotiffCreator() 
 {
 
+  finalSizeX = 200;
+  finalSizeY = 200;
   geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
   mapIm_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
+  if (geotiff_->isNull())
+  {
+ }
+  
 
 
 }
@@ -122,24 +128,30 @@ GeotiffCreator::GeotiffCreator()
 void GeotiffCreator::saveMissionName(std::string missionName)
 {
   this->missionName = QString::fromStdString(missionName);
-  
 }
 
 
 void GeotiffCreator::onCreateGeotiffClicked()
 {
+
+  ROS_ERROR("onCreateGeotiffClicked()");
+
+  geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
   QPainter geotiffPainter;
   geotiffPainter.begin(geotiff_);
+  
 
   drawCheckers(finalSizeX, finalSizeY, &geotiffPainter);
   drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapOrientation(finalSizeX, finalSizeY, &geotiffPainter);
   drawMapScale(finalSizeX, finalSizeY, &geotiffPainter);
+  ROS_ERROR("onCreateGeotiffClicked() finished");
 
   }
   
 void GeotiffCreator::inCreateGeotiffClicked()
 {
+  ROS_ERROR("inCreateGeotiffClicked()");
   QPainter geotiffPainter;
   geotiffPainter.begin(geotiff_);
   
@@ -150,6 +162,7 @@ void GeotiffCreator::inCreateGeotiffClicked()
   geotiffPainter.drawImage(mapP, *mapIm_);
   
   drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter);
+  ROS_ERROR("inCreateGeotiffClicked() finished");
 }
   
 void GeotiffCreator::saveGeotiff()
@@ -313,11 +326,15 @@ void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
   int ysize = map->info.width;
   
   
-  ROS_ERROR("SIZEX:%d",xsize);
-  ROS_ERROR("SIZEX:%d",ysize);
+  ROS_ERROR("sizex:%d",xsize);
+  ROS_ERROR("Sizey:%d",ysize);
   
-  finalSizeY = (xsize/100)*100 +200;
-  finalSizeX = (ysize/100)*100 +200;
+  this->finalSizeY = (xsize/100)*100 +200;
+  this->finalSizeX = (ysize/100)*100 +200;
+
+
+  ROS_ERROR("FinalSizeX:%d",finalSizeX);
+  ROS_ERROR("FinalSizeY:%d",finalSizeY);
   
   mapIm_ = new QImage(xsize, ysize, QImage::Format_ARGB32);
   QPainter mapPainter;

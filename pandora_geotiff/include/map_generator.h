@@ -21,8 +21,7 @@ class MapGenerator
 private:  
 
   GeotiffCreator * geotiffCreator;
-  
-  
+
   std::string p_plugin_list_;
   ros::NodeHandle pn_;
   ros::ServiceServer save_mission_service;

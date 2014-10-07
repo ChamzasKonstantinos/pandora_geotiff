@@ -68,6 +68,6 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
     ROS_ERROR("SUCCESS");
     
     this->writeGeotiff();
-    this->saveMissionName(req.SaveMisionFileName.c_str());
+    this->saveMissionName(req.SaveMisionFileName.data.c_str());
     return true;
   }
