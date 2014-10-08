@@ -56,4 +56,7 @@ target_link_libraries(geotiff_node
       GeotiffCreator
       map_generator
       )
-add_dependencies(map_generator ${catkin_EXPORTED_TARGETS})
+
+add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
+target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
+

@@ -13,5 +13,9 @@
     
   </node>
 
+
+   <node pkg="pandora_geotiff" type="DataFusionSrvMock" name="DataFusionSrvMock" output="screen" >
+
+    </node>
 </launch>
 

@@ -63,6 +63,7 @@ void ObjectsWriter::initialize(const std::string& name)
   std::string service_name_;
 
   plugin_nh.param("service_name", service_name_, std::string("data_fusion_geotiff"));
+  //~ ROS_ERROR(
 
   service_client_ = nh_.serviceClient<pandora_data_fusion_msgs::DatafusionGeotiffSrv>(service_name_);
 
@@ -79,18 +80,22 @@ void ObjectsWriter::getObjectsData()
       ROS_ERROR_NAMED(name_, "Cannot draw Objects, service %s failed", service_client_.getService().c_str());
       return;
     }
+
+
     
-    if(qrx!=0) delete[] qrx;
-    if(qry!=0) delete[] qry;
-    if(qrcontent!=0) delete[] qrcontent;	
-    if(qrtimestamp!=0) delete[] qrtimestamp;
-    if(qrworldx!=0) delete[] qrworldx;
-    if(qrworldy=0) delete[] qrworldy;
-    if(victimsx!=0) delete[] victimsx;
-    if(victimsy!=0) delete[] victimsy;
-    if(hazmatx!=0) delete[] hazmatx;
-    if(hazmaty!=0) delete[] hazmaty;
-    if(pattern!=0) delete[] pattern;
+    //~ if(qrx!=0) delete[] qrx;
+    //~ if(qry!=0) delete[] qry;
+    //~ if(qrcontent!=0) delete[] qrcontent;
+    //~ if(qrtimestamp!=0) delete[] qrtimestamp;
+    //~ if(qrworldx!=0) delete[] qrworldx;
+    //~ if(qrworldy=0) delete[] qrworldy;
+    //~ if(victimsx!=0) delete[] victimsx;
+    //~ if(victimsy!=0) delete[] victimsy;
+    //~ if(hazmatx!=0) delete[] hazmatx;
+    //~ if(hazmaty!=0) delete[] hazmaty;
+    //~ if(pattern!=0) delete[] pattern;
+    
+    
  
     int qrSize = dataFusionSrv.response.qrx.size();
     
@@ -100,14 +105,15 @@ void ObjectsWriter::getObjectsData()
     qrworldx = new std::vector<float>();
     qrworldy = new std::vector<float>();
     qrtimestamp = new std::vector<ros::Time>();
+    ROS_ERROR("AAAAAAAAAAAAAAAAAA");
     
     for(int i =0 ; i < qrSize ; i ++){
        qrx->push_back(dataFusionSrv.response.qrx[i]);
        qry->push_back(dataFusionSrv.response.qry[i]);
-       qrcontent->push_back(dataFusionSrv.response.qrcontent[i]);
+       //~ qrcontent->push_back(dataFusionSrv.response.qrcontent[i]);
        qrworldx->push_back(dataFusionSrv.response.qrworldx[i]);
        qrworldy->push_back(dataFusionSrv.response.qrworldy[i]);
-       qrtimestamp->push_back(dataFusionSrv.response.qrtimestamp[i]);
+       //~ qrtimestamp->push_back(dataFusionSrv.response.qrtimestamp[i]);
        ROS_INFO("QRS_SAVED SUCCESEFULLY");
      }
     
@@ -140,8 +146,13 @@ void ObjectsWriter::getObjectsData()
 void ObjectsWriter::draw(MapWriterInterface *interface)
 {
     if(!initialized_) return;
+
+    
+    this->getObjectsData();
+    
     ROS_INFO("DRAWING THE AWESOME OBJECTS");
-    return;
+    
+
 
     Eigen::Vector2f coords;
     std::string txt;
