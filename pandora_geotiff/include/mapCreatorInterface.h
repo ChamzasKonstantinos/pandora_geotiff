@@ -58,7 +58,7 @@ public:
 *@param grid_space [int ] :The space between the lines in the grid .If 0 then no grid is drawed 
 *@return void
 **/
-  virtual void drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color, int grid_space = 0 ) = 0;
+  virtual void drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color,const int& grid_space = 0 ) = 0;
 /**
 *@brief Draws an Object with a specific color and a specific shape
 *@details possible shapes {Diamond,Circle,Initial Arrow}
@@ -70,7 +70,7 @@ public:
 *@return void
 **/
   virtual void drawObjectOfInterest(const Eigen::Vector2f& coords,const std::string& color,
-    const std::string& shape, int sequence , int size) = 0;
+    const std::string& shape,const int& sequence ,const int& size) = 0;
 /**
 *@brief Draws A trajectory of a specified color 
 *@details each pixel is painted differently

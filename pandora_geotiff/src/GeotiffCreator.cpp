@@ -38,284 +38,279 @@
 
 #include "pandora_geotiff/GeotiffCreator.h"
 //~ std::string homeFolderString("/home/konstantinos/Desktop/image.jpg");
-
-GeotiffCreator::GeotiffCreator()
-{
-
-  geotiffBackgroundIm_ = NULL
-  mapIm_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
-}
-
-void GeotiffCreator::onCreateGeotiffClicked()
-{
-
-  ROS_ERROR("onCreateGeotiffClicked()");
-
-  geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
-  QPainter geotiffPainter;
-  geotiffPainter.begin(geotiff_);
-
-
-  drawCheckers(finalSizeX, finalSizeY, &geotiffPainter);
-  drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
-  drawMapOrientation(finalSizeX, finalSizeY, &geotiffPainter);
-  drawMapScale(finalSizeX, finalSizeY, &geotiffPainter);
-  ROS_ERROR("onCreateGeotiffClicked() finished");
-
+namespace pandora_geotiff{
+  
+  GeotiffCreator::GeotiffCreator()
+  {
+    geotiffBackgroundIm_ = NULL;
+    goetiffMapIm_= NULL;
+    geotiffFinalIm_ = NULL;
+    missionName_ = QString("TestMission");
+    missionNamePrefix_ = QString("/RRL_2015_PANDORA_");
+  // This parameters should be moved in a yaml file
+    CHECKER_SIZE = 50;
+    MAP_OFFSET = 2*CHECKER_SIZE;
+    CHECKER_COLOR_LIGHT = "LIGHT_GREY";
+    CHECKER_COLOR_DARK =  "DARK_GREY";
+    MISSION_NAME_COORDS =  Eigen::Vector2i(CHECKER_SIZE/2 ,CHECKER_SIZE/2)
+    MISSION_NAME_COLOR = "DARK_BLUE_F";
+    MISSION_NAME_WIDTH = 2;
+    MAP_SCALE_COORDS = Eigen::Vector2i(CHECKER_SIZE/2, CHECKER_SIZE*2)
+    MAP_SCALE_COLOR = "DARK_BLUE_M";
+    MAP_SCALE_WIDTH = 4;
+    MAP_ORIENTATION_COORDS =Eigen::Vector2i(CHECKER_SIZE*2, CHECKER_SIZE*2);
+    MAP_ORIENTATION_COLOR = "DARK_BLUE_M"; 
+    MAP_ORIENTATION_WIDTH = 4 ;
+    MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
+    
+    colorMap["DARK_BLUE_F"]     = QColor(0, 44, 207);
+    colorMap["DARK_BLUE_M"]     = QColor(0, 50, 120);
+    colorMap["DARK_BLUE_W"]     = QColor(0, 40, 120);
+    colorMap["LIGHT_GREY"]      = QColor(226, 226, 227);
+    colorMap["DARK_GREY"]       = QColor(237, 237, 238);
+    colorMap["BLACK"]           = QColor(190,190,191);
+    colorMap["YELLOW"]          = QColor(255, 200, 0);
+    colorMap["WHITE_MAX"]       = QColor(255, 255, 255);
+    colorMap["WHITE_MIN"]       = QColor(128, 128, 128);
+    colorMap["LIGHT_GREEN_MAX"] = QColor(180, 230, 180);
+    colorMap["LIGHT_GREEN_MIN"] = QColor(130, 230, 130);
+    colorMap["SOLID_RED"]       = QColor(240, 10, 10);
+    colorMap["YELLOW"]          = QColor(255, 200, 0);
+    colorMap["SOLID_ORANGE"]    = QColor(255, 100, 30);
+    colorMap["SOLID BLUE"]      = QColor(10, 10, 240);
+    colorMap["MAGENTA"]         = QColor(120, 0, 140);
+    
   }
-
-void GeotiffCreator::inCreateGeotiffClicked()
-{
-  ROS_ERROR("inCreateGeotiffClicked()");
-  QPainter geotiffPainter;
-  geotiffPainter.begin(geotiff_);
-
-  int ioffset = 100;
-  int joffset = 100;
-
-  QPoint mapP(ioffset, joffset);
-  geotiffPainter.drawImage(mapP, *mapIm_);
-
-  drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter);
-  ROS_ERROR("inCreateGeotiffClicked() finished");
-}
-
-void GeotiffCreator::saveGeotiff()
-{
-   (*geotiff_).save("/home/konstantinos/Desktop/image.jpg");
-}
-
-void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPainter) {
-
-  QColor colorLightGreyGrid;
-  QColor colorDarkGreyGrid;
-  colorLightGreyGrid.setRgb(226,226,227);
-  colorDarkGreyGrid.setRgb(237,237,238);
-
-  QBrush gridBrush(colorLightGreyGrid);
-    //draw (checkerboard) grid
-    bool dark = true;
-        for (int i = 0; i < xsize/50 ; i++) {
-          dark = !dark;
-          for (int j = 0; j < ysize/50 ; j++) {
-              dark = !dark;
-              if (dark) {
-                  gridBrush.setColor(colorLightGreyGrid);
-                   geotiffPainter->setPen(colorLightGreyGrid);
-              }
-             else
-             {
-                gridBrush.setColor(colorDarkGreyGrid);
-                geotiffPainter->setPen(colorDarkGreyGrid);
-            }
-            int x = 50 * i;
-            int y = 50 * j;
-            int width = 50;
-            int height = 50;
-            // Draw rectangle to screen.
-            geotiffPainter->drawRect(x, y, width, height);
-            geotiffPainter->fillRect(x, y, width, height, gridBrush);
-
+  //THIS FUNCTION MUST ONLY BE CALLED AFTER geotiffMapIm is initialized!
+  void GeotiffCreator::createBackgroundIm()
+  {
+  
+    ROS_INFO("Creating BackGroundIm...");
+    
+    geotiffBackgroundIm_= new QImage(geotiffMapIm_->height()+MAP_OFFSET,geotiffMapIm_->width()+MAP_OFFSET, QImage::Format_RGB32);
+    QPainter geotiffPainter;
+    geotiffPainter.begin(geotiffBackgroundIm_);
+  
+    drawCheckers(CHECKER_SIZE, CHECKER_COLOR_LIGHT, CHECKER_COLOR_DARK, &geotiffPainter);
+    drawMissionName(MISSION_NAME_COORDS, MISSION_NAME_COLOR, MISSION_NAME_WIDTH, &geotiffPainter);
+    drawMapScale(MAP_SCALE_COORDS, MAP_SCALE_COLOR, MAP_SCALE_WIDTH, &geotiffPainter);
+    drawMapOrientation(MAP_ORIENTATION_COORDS, MAP_ORIENTATION_COLOR, MAP_ORIENTATION_WIDTH, &geotiffPainter);
+  
+    ROS_INFO("BackGroundIm was created succesfully...");
+  
+    }
+  
+  void saveGeotiff(std::string homeFolderString);
+  {
+    ROS_INFO("Saving Geotiff...");
+    (*geotiffBackgroundIm_).save(homeFolderString);
+    ROS_INFO("Geotiff... was saved succesfully");
+    
+  }
+  void setMissionName(std::string missionName);
+  {
+    missionName_= QString(missionName.c_str());
+  }
+  
+    
+  
+  void drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter)
+  {
+    ROS_INFO("Drawing Checkers...");
+    QBrush gridBrush(colorMap[colorD]);
+    bool dark = false;
+  
+      //draw (checkerboard) grid
+    for (int i = 0; i < geotiffBackgroundIm_.width()/CHECKER_SIZE ; i++) {
+      dark = !dark;
+      for (int j = 0; j < geotiffBackgroundIm_.height()/CHECKER_SIZE ; j++) {
+        dark = !dark;
+        if (dark) {
+           geotiffPainter->setPen(colorMap[colorD]);
+           gridBrush.setColor(colorMap[colorD]);
+           }
+        else{
+          geotiffPainter->setPen(colorMap[colorD]);
+          gridBrush.setColor(colorMap[colorD]);
           }
-    }
-}
-
-void GeotiffCreator::drawFileName( int xsize ,int ysize ,  QPainter* geotiffPainter ){
-
-
-   QColor colorBlueText;
-   colorBlueText.setRgb(0, 44, 207);
-   QPen filenamePen = QPen(colorBlueText);
-   filenamePen.setWidth(4);
-   geotiffPainter->setPen(filenamePen);
-
-   QPointF filenamePoint(25 ,25);
-   QString filenameString("/RRL_2013_PANDORA_");
-   filenameString.append(missionName);
-   filenameString.append(".tiff");
-
-   QPen colorBlueTextPen(colorBlueText);
-   colorBlueTextPen.setWidth(2);
-   geotiffPainter->setPen(colorBlueTextPen);
-
-   geotiffPainter->drawText(filenamePoint, filenameString);
-}
-void GeotiffCreator::drawMapScale( int xsize ,int ysize ,  QPainter* geotiffPainter ){
-       QColor colorMapScale;
-   colorMapScale.setRgb(0, 50, 140);
-
-   QPen colorMapScalePen = QPen(colorMapScale);
-   colorMapScalePen.setWidth(4);
-   geotiffPainter->setPen(colorMapScalePen);
-
-   geotiffPainter->setPen(colorMapScale);
-   QPointF lengthUnitPoint1(25, 50);
-   QPointF lengthUnitPoint2(25, 100);
-
-   geotiffPainter->drawLine(lengthUnitPoint1, lengthUnitPoint2);
-
-   QPointF lengthUnitPoint1Up(21, 50);
-   QPointF lengthUnitPoint2Up(29, 50);
-   geotiffPainter->drawLine(lengthUnitPoint1Up, lengthUnitPoint2Up);
-
-   QPointF lengthUnitPoint1Down(21, 100);
-   QPointF lengthUnitPoint2Down(29, 100);
-   geotiffPainter->drawLine(lengthUnitPoint1Down, lengthUnitPoint2Down);
-
-   QPointF lengthUnitTextPoint(28, 80);
-   QString lengthUnitText("1m");
-   geotiffPainter->drawText(lengthUnitTextPoint, lengthUnitText);
- }
-void GeotiffCreator::drawMapOrientation( int xsize ,int ysize , QPainter* geotiffPainter ){
-       QColor colorOrientation;
-   colorOrientation.setRgb(0, 50, 140);
-
-   QPointF pointX1(100, 50);
-   QPointF pointX2(100, 100);
-   QPointF pointY1(50, 100);
-   QPointF pointY2(100, 100);
-
-   geotiffPainter->drawLine(pointX1, pointX2);
-   geotiffPainter->drawLine(pointY1, pointY2);
-
-   QPointF pointYup(55, 95);
-   QPointF pointYdown(55, 105);
-   geotiffPainter->drawLine(pointY1, pointYup);
-   geotiffPainter->drawLine(pointY1, pointYdown);
-
-   QPointF pointXright(105, 55);
-   QPointF pointXleft(95, 55);
-   geotiffPainter->drawLine(pointX1, pointXright);
-   geotiffPainter->drawLine(pointX1, pointXleft);
-
-   QPointF pointXText(110, 52);
-   QString XString("x");
-   geotiffPainter->drawText(pointXText, XString);
-
-   QPointF pointYText(60, 93);
-   QString YString("y");
-   geotiffPainter->drawText(pointYText, YString);
- }
-
-void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter) {
-
-  QColor exploredAreaColor;
-  exploredAreaColor.setRgb(190,190,191);
-  QPen exploredAreaPen(exploredAreaColor);
-  geotiffPainter->setPen(exploredAreaPen);
-
-  for(int i=0; i<ysize-50; i++){
-    for(int j=15; j<xsize-50; j+=25){
-      QRgb rgb = geotiff_->pixel(i,j);
-      int r = qRed(rgb);
-      int g = qGreen(rgb);
-      int b = qBlue(rgb);
-      if( ((r==g)&&(g==b)&&(r>=140)) || ((g==230)&&(r==b)&&(r>=130)&&(r<=180)) ){
-        geotiffPainter->drawPoint(i,j);
-      }
-    }
-  }
-
-  for(int i=15; i<xsize-50; i+=25){
-    for(int j=0; j<ysize-50; j++){
-      QRgb rgb = geotiff_->pixel(i,j);
-        int r = qRed(rgb);
-        int g = qGreen(rgb);
-        int b = qBlue(rgb);
-        if( ((r==g)&&(g==b)&&(r>=140)) || ((g==230)&&(r==b)&&(r>=130)&&(r<=180)) ){
-          geotiffPainter->drawPoint(i,j);
+        geotiffPainter->drawRect(i*CHECKER_SIZE, j*CHECKER_SIZE, CHECKER_SIZE, CHECKER_SIZE);
+        geotiffPainter->fillRect(i*CHECKER_SIZE, j*CHECKER_SIZE, CHECKER_SIZE, CHECKER_SIZE, gridBrush);
         }
+      }
+    ROS_INFO("Checkers were drawed Succesfully!");
+    }
+  
+  void drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
+  {
+    ROS_INFO("Drawing MissionName...");
+    QPen Pen = QPen(colorMap[color]);
+    Pen.setWidth(width);
+    geotiffPainter->setPen(Pen);
+    
+    QPointF filenamePoint(coords.x() ,coords.y());
+    
+    QString filenameString(missionNamePrefix_);
+    filenameString.append(missionName_);
+    filenameString.append(".tiff");
+
+    geotiffPainter->drawText(filenamePoint, filenameString);
+    ROS_INFO("MissionName was drawed succesfully");
+  }
+  
+void drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
+  {
+     ROS_INFO("Drawing MapScale...");
+     QPen Pen = QPen(colorMap[color]);
+     Pen.setWidth(width);
+     geotiffPainter->setPen(Pen);
+    // Drawing the main length unit side
+     QPoint Point1(coords.x(), coords.y());
+     QPoint Point2(coords.x(), coords.y() + CHECKER_SIZE);
+  
+     geotiffPainter->drawLine(Point1, Point2);
+     //Drawing the  length unit up side (1/12 of the checker size)
+     QPoint Point1Up(Point1.x() - CHECKER_SIZE/12, Point1.y());
+     QPoint Point2Up(Point1.x() + CHECKER_SIZE/12, Point1.y());
+     geotiffPainter->drawLine(Point1Up, Point2Up);
+
+     //Drawing the  length unit down side (1/12 of the checker size)
+     QPoint Point1Down(Point2.x() - CHECKER_SIZE/12, Point2.y());
+     QPoint Point2Down(Point2.x() + CHECKER_SIZE/12, Point2.y());
+     geotiffPainter->drawLine(Point1Down, Point2Down);
+
+     //Draw the length unit point 1m 
+     QPointF TextPoint(Point1.x() + CHECKER_SIZE*3/50, Point1.y() + CHECKER_SIZE*(3/5));
+     QString Text("1m");
+     geotiffPainter->drawText(TextPoint, Text);
+
+     ROS_INFO("MapScale was drawed succesfully!");
+   }
+  void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
+    const int& width, QPainter* geotiffPainter);
+  {
+     ROS_INFO("Drawing MapOrientation...");
+     //Drawing the lines
+     QPen Pen = QPen(colorMap[color]);
+     Pen.setWidth(width);
+     geotiffPainter->setPen(Pen);
+     
+     QPoint pointY(coords.x() - CHECKER_SIZE, coords.y());
+     QPoint pointC(coords.x(),coords.y());
+     QPoint pointX(coords.x(),coords.y() - CHECKER_SIZE);
+  
+     geotiffPainter->drawLine(pointY, pointC);
+     geotiffPainter->drawLine(pointC, pointX);
+     //Drawing the Y arrow
+     QPoint pointYup(pointY.x() + CHECKER_SIZE/10, pointY.y() - CHECKER_SIZE/10);
+     QPoint pointYdown(pointY.x() + CHECKER_SIZE/10, pointY.y() + CHECKER_SIZE/10);
+     geotiffPainter->drawLine(pointY1, pointYup);
+     geotiffPainter->drawLine(pointY1, pointYdown);
+
+     //Drawing The X arrow
+     QPoint pointXup(pointX.x() + CHECKER_SIZE/10, pointX.y() - CHECKER_SIZE/10);
+     QPoint pointXdown(pointX.x() + CHECKER_SIZE/10, pointX.y() + CHECKER_SIZE/10);
+     geotiffPainter->drawLine(pointX1, pointXup);
+     geotiffPainter->drawLine(pointX1, pointXdown);
+
+     //Drawing Y
+     QPoint pointYText(PointY.x() + CHECKER_SIZE/5, PointY.y() - CHECKER_SIZE/6);
+     QString YString("y");
+     geotiffPainter->drawText(pointYText, YString);
+
+     //Drawing X
+     QPoint pointXText(PointX.x() + CHECKER_SIZE/5, PointX.y() - CHECKER_SIZE/6);
+     QString XString("X");
+     geotiffPainter->drawText(pointXText, XString);
+
+     
+   }
+  
+  void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
+  {
+  
+    int xsize = map->info.height;
+    int ysize = map->info.width;
+  
+  
+    ROS_ERROR("sizex:%d",xsize);
+    ROS_ERROR("Sizey:%d",ysize);
+  
+    this->finalSizeY = (xsize/100)*100 +200;
+    this->finalSizeX = (ysize/100)*100 +200;
+  
+  
+    ROS_ERROR("FinalSizeX:%d",finalSizeX);
+    ROS_ERROR("FinalSizeY:%d",finalSizeY);
+  
+    mapIm_ = new QImage(xsize, ysize, QImage::Format_ARGB32);
+    QPainter mapPainter;
+    mapPainter.begin(mapIm_);
+  
+    mapPainter.setCompositionMode(QPainter::CompositionMode_Source);
+    mapPainter.fillRect(mapIm_->rect(), Qt::transparent);
+    mapPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  
+  
+    QColor wallsObstaclesColor;
+    wallsObstaclesColor.setRgb(0, 40, 120);
+  
+    for(int i=0; i<xsize; i++){
+      for(int j=0; j<ysize; j++){
+        if(map->data[j*xsize + i] < 127 && map->data[j*xsize + i] > 0){
+  
+          QPen wallsObstaclesPen(wallsObstaclesColor);
+          wallsObstaclesPen.setWidth(3);
+          mapPainter.setPen(wallsObstaclesPen);
+          mapPainter.drawPoint(i,ysize-1-j);
+        }
+        else if(map->data[j*xsize + i] > 126 ){
+         QColor searchedAreaColor;
+         searchedAreaColor.setRgb(map->data[j*xsize + i], map->data[j*xsize + i], map->data[j*xsize + i]);
+         mapPainter.setPen(searchedAreaColor);
+         mapPainter.drawPoint(i,ysize-1-j);
+        }
+      }
     }
   }
-}
-
-
-void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
-{
-
-  int xsize = map->info.height;
-  int ysize = map->info.width;
-
-
-  ROS_ERROR("sizex:%d",xsize);
-  ROS_ERROR("Sizey:%d",ysize);
-
-  this->finalSizeY = (xsize/100)*100 +200;
-  this->finalSizeX = (ysize/100)*100 +200;
-
-
-  ROS_ERROR("FinalSizeX:%d",finalSizeX);
-  ROS_ERROR("FinalSizeY:%d",finalSizeY);
-
-  mapIm_ = new QImage(xsize, ysize, QImage::Format_ARGB32);
-  QPainter mapPainter;
-  mapPainter.begin(mapIm_);
-
-  mapPainter.setCompositionMode(QPainter::CompositionMode_Source);
-  mapPainter.fillRect(mapIm_->rect(), Qt::transparent);
-  mapPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-
-
-  QColor wallsObstaclesColor;
-  wallsObstaclesColor.setRgb(0, 40, 120);
-
-  for(int i=0; i<xsize; i++){
-    for(int j=0; j<ysize; j++){
-      if(map->data[j*xsize + i] < 127 && map->data[j*xsize + i] > 0){
-
-        QPen wallsObstaclesPen(wallsObstaclesColor);
-        wallsObstaclesPen.setWidth(3);
-        mapPainter.setPen(wallsObstaclesPen);
-        mapPainter.drawPoint(i,ysize-1-j);
-      }
-      else if(map->data[j*xsize + i] > 126 ){
-       QColor searchedAreaColor;
-       searchedAreaColor.setRgb(map->data[j*xsize + i], map->data[j*xsize + i], map->data[j*xsize + i]);
-       mapPainter.setPen(searchedAreaColor);
-       mapPainter.drawPoint(i,ysize-1-j);
-      }
+  
+  void GeotiffCreator::drawPath(const Eigen::Vector3f& start, const std::vector<Eigen::Vector2f>& points)
+  {
+    QPainter mapPainter;
+    mapPainter.begin(mapIm_);
+  
+    int robotx = points[0].x();
+    int roboty = points[0].y();
+    QColor initPoseColor;
+    initPoseColor.setRgb(255, 200, 0);
+    QPen initPosePen(initPoseColor);
+    mapPainter.setPen(initPosePen);
+    QBrush initPoseBrush(initPoseColor);
+    mapPainter.setBrush(initPoseBrush);
+    QPoint *initPosePoints = new QPoint[5];
+    initPosePoints[0].setX(robotx+15);
+    initPosePoints[0].setY(roboty);
+    initPosePoints[1].setX(robotx-10);
+    initPosePoints[1].setY(roboty-5);
+    initPosePoints[2].setX(robotx-5);
+    initPosePoints[2].setY(roboty);
+    initPosePoints[3].setX(robotx-10);
+    initPosePoints[3].setY(roboty+5);
+    mapPainter.drawPolygon(initPosePoints, 4);
+  
+    QColor pathColor;
+    pathColor.setRgb(120,0,140);
+    QPen pathPen(pathColor);
+    pathPen.setWidth(2);
+    mapPainter.setPen(pathPen);
+  
+    for(int i=0; i<points.size()-1; i++){
+     mapPainter.drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
     }
   }
-}
-
-void GeotiffCreator::drawPath(const Eigen::Vector3f& start, const std::vector<Eigen::Vector2f>& points)
-{
-  QPainter mapPainter;
-  mapPainter.begin(mapIm_);
-
-  int robotx = points[0].x();
-  int roboty = points[0].y();
-  QColor initPoseColor;
-  initPoseColor.setRgb(255, 200, 0);
-  QPen initPosePen(initPoseColor);
-  mapPainter.setPen(initPosePen);
-  QBrush initPoseBrush(initPoseColor);
-  mapPainter.setBrush(initPoseBrush);
-  QPoint *initPosePoints = new QPoint[5];
-  initPosePoints[0].setX(robotx+15);
-  initPosePoints[0].setY(roboty);
-  initPosePoints[1].setX(robotx-10);
-  initPosePoints[1].setY(roboty-5);
-  initPosePoints[2].setX(robotx-5);
-  initPosePoints[2].setY(roboty);
-  initPosePoints[3].setX(robotx-10);
-  initPosePoints[3].setY(roboty+5);
-  mapPainter.drawPolygon(initPosePoints, 4);
-
-  QColor pathColor;
-  pathColor.setRgb(120,0,140);
-  QPen pathPen(pathColor);
-  pathPen.setWidth(2);
-  mapPainter.setPen(pathPen);
-
-  for(int i=0; i<points.size()-1; i++){
-   mapPainter.drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
-  }
-}
-
-
-void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& txt, const Color& color)
-{
+  
+  
+  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& txt, const Color& color)
+  {
 
     QPainter mapPainter;
     mapPainter.begin(mapIm_);
@@ -356,7 +351,8 @@ void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const s
 
     QPoint ObjectPoint(coords.x(), coords.y());
     mapPainter.drawImage(ObjectPoint, objectIm);
-}
+  }
+}//namespace pandora_geotiff
 
 
 
