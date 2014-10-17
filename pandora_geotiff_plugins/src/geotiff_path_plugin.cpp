@@ -121,11 +121,6 @@ void PathWriter::draw(MapWriterInterface *interface)
     }
     ROS_INFO("DRAWED THE AWESOME PATH SUCCESFULLY");
     
-
-
-   
-
-
 }
 
 } // namespace

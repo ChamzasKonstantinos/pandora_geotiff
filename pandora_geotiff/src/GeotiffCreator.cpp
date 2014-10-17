@@ -1,135 +1,50 @@
-/*
-* Copyright (C) 2011 by Pandora Robotics Team, Aristotle Univeristy of Thessaloniki, Greece
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy
-* of this software and associated documentation files (the "Software"), to deal
-* in the Software without restriction, including without limitation the rights
-* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-* copies of the Software, and to permit persons to whom the Software is
-* furnished to do so, subject to the following conditions:
-*
-* The above copyright notice and this permission notice shall be included in
-* all copies or substantial portions of the Software.
-*
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-* THE SOFTWARE.
-*/
+/*********************************************************************
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors:
+ *   Chamzas Konstantinos <chamzask@gmail.com>
+ *********************************************************************/
 
+#include "pandora_geotiff/GeotiffCreator.h"
+//~ std::string homeFolderString("/home/konstantinos/Desktop/image.jpg");
 
-#include "GeotiffCreator.h"
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <fstream>
-
-
-QString homeFolderString("/home/konstantinos");
-
-
-
-std::string getDateAndTime(){
-
-time_t t = time(0); // get time now
-struct tm * now = localtime( & t );
-char buf[20];
-std::stringstream ss;
-
-strftime(buf, sizeof(buf), "%F", now);
-
-ss << buf << "; ";
-
-strftime(buf, sizeof(buf), "%T", now);
-
-ss << buf;
-
-std::string str = ss.str();
-
-    return str;
-
-}
-
-std::string getQrTime(time_t qrTime){
-
-struct tm * now = localtime( & qrTime );
-char buf[10];
-std::stringstream ss;
-strftime(buf, sizeof(buf), "%T", now);
-ss << buf;
-
-std::string str = ss.str();
-
-    return str;
-}
-
-GeotiffCreator::GeotiffCreator() 
+GeotiffCreator::GeotiffCreator()
 {
 
-  finalSizeX = 200;
-  finalSizeY = 200;
-  geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
+  geotiffBackgroundIm_ = NULL
   mapIm_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
-  if (geotiff_->isNull())
-  {
- }
-  
-
-
 }
-
-
-//~ void GeotiffCreator::generateQrCsv(){
-//~ 
-//~ QString filenameString("/RC_2014_PANDORA_");
-//~ filenameString.append(missionName);
-//~ filenameString.append("_qr.csv");
-//~ 
-//~ QString filepath = homeFolderString;
-//~ filepath = filepath.append("/Desktop/");
-//~ filepath.append(filenameString);
-//~ std::string filepathStr = filepath.toUtf8().constData();
-//~ 
-//~ std::cout << filepathStr << "\n";
-//~ 
-//~ std::ofstream csvFile;
-//~ csvFile.open (filepathStr.c_str());
-//~ 
-//~ // ---csvFile---
-//~ // Resko Koblenz, Germany
-//~ // 2013-06-23; 14:37:03
-//~ // Semi1
-//~ //
-//~ // 1;14:28:01;Y_1_1_chair_yoked;-8.29994;-2.29014
-//~ 
-//~ csvFile << "PANDORA AUTh, Greece" << std::endl;
-//~ csvFile << getDateAndTime() << std::endl;
-//~ csvFile << missionName.toUtf8().constData() << std::endl << std::endl;
-//~ std::string qrWorldTime[qrSize];
-//~ 
-
-
-//~ for(int i=0; i<qrSize; i++){
-//~ qrWorldTime[i] = getQrTime(qrTime[i]);
-//~ }
-//~ 
-//~ for(int i=0; i<qrSize; i++)
-//~ csvFile << i+1 << ";" << qrWorldTime[i] << ";" << qrType[i] << ";" << qrWorldX[i] << ";" << qrWorldY[i] << std::endl;
-//~ 
-//~ 
-//~ csvFile.close();
-//~ 
-//~ }
-
-
-void GeotiffCreator::saveMissionName(std::string missionName)
-{
-  this->missionName = QString::fromStdString(missionName);
-}
-
 
 void GeotiffCreator::onCreateGeotiffClicked()
 {
@@ -139,7 +54,7 @@ void GeotiffCreator::onCreateGeotiffClicked()
   geotiff_= new QImage(finalSizeX,finalSizeY, QImage::Format_RGB32);
   QPainter geotiffPainter;
   geotiffPainter.begin(geotiff_);
-  
+
 
   drawCheckers(finalSizeX, finalSizeY, &geotiffPainter);
   drawFileName(finalSizeX, finalSizeY, &geotiffPainter);
@@ -148,29 +63,25 @@ void GeotiffCreator::onCreateGeotiffClicked()
   ROS_ERROR("onCreateGeotiffClicked() finished");
 
   }
-  
+
 void GeotiffCreator::inCreateGeotiffClicked()
 {
   ROS_ERROR("inCreateGeotiffClicked()");
   QPainter geotiffPainter;
   geotiffPainter.begin(geotiff_);
-  
+
   int ioffset = 100;
   int joffset = 100;
 
   QPoint mapP(ioffset, joffset);
   geotiffPainter.drawImage(mapP, *mapIm_);
-  
+
   drawExploredArea(finalSizeX, finalSizeY, &geotiffPainter);
   ROS_ERROR("inCreateGeotiffClicked() finished");
 }
-  
+
 void GeotiffCreator::saveGeotiff()
 {
-  //save geotiff_ in Desktop
-   QString filepath = homeFolderString;
-   filepath = filepath.append("/Desktop/");
-   //~ filepath.append(filenameString);
    (*geotiff_).save("/home/konstantinos/Desktop/image.jpg");
 }
 
@@ -191,8 +102,8 @@ void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPai
               if (dark) {
                   gridBrush.setColor(colorLightGreyGrid);
                    geotiffPainter->setPen(colorLightGreyGrid);
-              } 
-             else 
+              }
+             else
              {
                 gridBrush.setColor(colorDarkGreyGrid);
                 geotiffPainter->setPen(colorDarkGreyGrid);
@@ -204,14 +115,14 @@ void GeotiffCreator::drawCheckers ( int xsize ,int ysize ,  QPainter* geotiffPai
             // Draw rectangle to screen.
             geotiffPainter->drawRect(x, y, width, height);
             geotiffPainter->fillRect(x, y, width, height, gridBrush);
-            
+
           }
     }
 }
 
 void GeotiffCreator::drawFileName( int xsize ,int ysize ,  QPainter* geotiffPainter ){
-  
-  
+
+
    QColor colorBlueText;
    colorBlueText.setRgb(0, 44, 207);
    QPen filenamePen = QPen(colorBlueText);
@@ -285,14 +196,14 @@ void GeotiffCreator::drawMapOrientation( int xsize ,int ysize , QPainter* geotif
    QString YString("y");
    geotiffPainter->drawText(pointYText, YString);
  }
- 
+
 void GeotiffCreator::drawExploredArea(int xsize , int ysize , QPainter* geotiffPainter) {
 
   QColor exploredAreaColor;
   exploredAreaColor.setRgb(190,190,191);
   QPen exploredAreaPen(exploredAreaColor);
   geotiffPainter->setPen(exploredAreaPen);
-  
+
   for(int i=0; i<ysize-50; i++){
     for(int j=15; j<xsize-50; j+=25){
       QRgb rgb = geotiff_->pixel(i,j);
@@ -324,18 +235,18 @@ void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid* map)
 
   int xsize = map->info.height;
   int ysize = map->info.width;
-  
-  
+
+
   ROS_ERROR("sizex:%d",xsize);
   ROS_ERROR("Sizey:%d",ysize);
-  
+
   this->finalSizeY = (xsize/100)*100 +200;
   this->finalSizeX = (ysize/100)*100 +200;
 
 
   ROS_ERROR("FinalSizeX:%d",finalSizeX);
   ROS_ERROR("FinalSizeY:%d",finalSizeY);
-  
+
   mapIm_ = new QImage(xsize, ysize, QImage::Format_ARGB32);
   QPainter mapPainter;
   mapPainter.begin(mapIm_);
@@ -376,7 +287,7 @@ void GeotiffCreator::drawPath(const Eigen::Vector3f& start, const std::vector<Ei
   int roboty = points[0].y();
   QColor initPoseColor;
   initPoseColor.setRgb(255, 200, 0);
-  QPen initPosePen(initPoseColor); 
+  QPen initPosePen(initPoseColor);
   mapPainter.setPen(initPosePen);
   QBrush initPoseBrush(initPoseColor);
   mapPainter.setBrush(initPoseBrush);
@@ -418,7 +329,7 @@ void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const s
     objectPainter.begin(&objectIm);
 
     objectPainter.setCompositionMode(QPainter::CompositionMode_Source);
-    objectPainter.fillRect(objectIm.rect(), Qt::transparent); 
+    objectPainter.fillRect(objectIm.rect(), Qt::transparent);
     objectPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
     objectPainter.setPen(objectColor);
@@ -444,7 +355,7 @@ void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const s
     objectPainter.end();
 
     QPoint ObjectPoint(coords.x(), coords.y());
-    mapPainter.drawImage(ObjectPoint, objectIm); 
+    mapPainter.drawImage(ObjectPoint, objectIm);
 }
 
 

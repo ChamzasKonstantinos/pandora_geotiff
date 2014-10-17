@@ -104,21 +104,8 @@ public:
 
 public Q_SLOTS:
 
-    /** A Qt SLOT-function which is called when the createGeotiffPushButton button is pressed
-*
-* it calls the necessary services to obtain the map related information, paints the map
-* on a qimage and stores it in a file on the disk.
-*
-*/
     void onCreateGeotiffClicked();
 
-    /** A Qt SLOT-function which is called when the geotiffMissionNamePlainTextEdit's text is changed
-*
-* it stores the desired mission name on a local variable in order to be used for
-* the geotif's filename
-*
-* \param[in] textInserted the mission name typed by the operator
-*/
     void saveMissionName(const QString & textInserted);
 };
 
