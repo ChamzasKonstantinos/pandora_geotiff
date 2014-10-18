@@ -21,7 +21,6 @@ target_link_libraries(map_loader
   yaml-cpp
   ${catkin_LIBRARIES}
   )
-
 ########################  Unit Tests  ###############################
 
 ########################  geotiff_creator  ####################################
@@ -30,6 +29,7 @@ catkin_add_gtest(geotiff_creator_test unit/geotiff_creator_test.cpp)
 target_link_libraries(geotiff_creator_test 
   ${catkin_LIBRARIES} 
   geotiff_creator
+  map_loader
   gtest_main
   )
 

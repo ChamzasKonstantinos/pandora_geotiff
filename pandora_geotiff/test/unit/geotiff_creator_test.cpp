@@ -35,12 +35,10 @@
  * Authors:
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
-
 #include "gtest/gtest.h"
-
 #include "geotiff_creator.h"
-
-
+#include "map_loader/map_loader.h"
+#include <ros/package.h>
 namespace pandora_geotiff
   {
 
@@ -49,18 +47,29 @@ namespace pandora_geotiff
       protected:
         GeotiffCreatorTest()
         {
+
+          ros::Time::init();
           gc = GeotiffCreator();
+          map = map_loader::loadMap(
+              ros::package::getPath("pandora_geotiff") +
+              "/test/test_maps/map1.yaml");
         }
         /*Variables*/
-
         GeotiffCreator gc;
+        nav_msgs::OccupancyGrid map;
     };
 
 
     
     TEST_F(GeotiffCreatorTest, createBackgroundIm)
     {
+
+      gc.drawMap(map,"MAGENTA");
       gc.createBackgroundIm();
       gc.saveGeotiff();
     }
-}  // namespace pandora_geotiff
+
+    
+  }// namespace pandora_geotiff
+  
+

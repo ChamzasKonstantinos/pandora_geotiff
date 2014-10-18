@@ -41,118 +41,113 @@
 #include <QtGui>
 #include <QAction>
 #include "ros/ros.h"
-#include <ros/callback_queue.h>
 #include "map_creator_interface.h"
 
 
 namespace pandora_geotiff{
+    
+  class GeotiffCreator : public MapWriterInterface
+  {
   
-class GeotiffCreator : public MapWriterInterface
-{
-
-public:
-  /**
-  *@brief GeotiffCreator constructor
-  **/
-  GeotiffCreator();
-  /**
-  *@brief GeotiffCreator destructor
-  **/
-  ~GeotiffCreator() {  };
-  /**
-  *@brief creates All the GeotiffBackgroundIm
-  * @details It includes TheCheckers,The Orientation,The Map Scale,The MissionName
-  *@warning This function Must be Called After the MapIm has been created or its size is known.
-  **/
-  void createBackgroundIm();
-  /**
-  *@brief save the GeotiffFinalGeotiffImg to the spacefied path
-  **/
-  void saveGeotiff(std::string homeFolderString = "/home/konstantinos/Desktop/image.jpg");
-  /**
-  *@brief sets the MissionName
-  **/
-  void setMissionName(std::string missionName);
-
+  public:
+    /**
+    *@brief GeotiffCreator constructor
+    **/
+    GeotiffCreator();
+    /**
+    *@brief GeotiffCreator destructor
+    **/
+    ~GeotiffCreator() {  };
+    /**
+    *@brief creates All the GeotiffBackgroundIm
+    * @details It includes TheCheckers,The Orientation,The Map Scale,The MissionName
+    *@warning This function Must be Called After the MapIm has been created or its size is known.
+    **/
+    void createBackgroundIm();
+    /**
+    *@brief save the GeotiffFinalGeotiffImg to the spacefied path
+    **/
+    void saveGeotiff(std::string homeFolderString = "/home/konstantinos/Desktop/image.jpg");
+    /**
+    *@brief sets the MissionName
+    **/
+    void setMissionName(std::string missionName);
   
-  virtual void drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color,const int& grid_space = 0);
-  virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
-     const std::string& shape,const int& sequence ,const int& size);
-  virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color);
-
-private:
-
-  //~ ros::NodeHandle _handle;
-
-  void geotiffTimerCb(const ros::TimerEvent& event);
-  /**
-  *@brief drawsTheCheckers of specified size and,color ,
-  *@param colorD [&std::string] : The Dark Color of the checkers
-  *@param colorL [&std::string] : The Light Color of the Checkers
-  *@param checkerSize [&std::string] : The size of the Checkers
-  *@return void
-  **/
-  void drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter);
-  /**
-  *@brief draws The missionName with a spesific color in a spesific point
-  *@param coords [&Eigen::Vector2f] : The coordinates of the Mission Name
-  *@param color [&std::string] : The color the Mission name is painted
-  *@param width [int ] : the width of the pen tha will be used
-  *@return void
-  **/
-  void drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
-  /**
-  *@brief draws The mapScale with a spesific color in a spesific point
-  *@param coords [&Eigen::Vector2f] : The coordinates of the mapscale
-  *@param color [&std::string] : The color the mapScale
-  *@param width [int] : the width of the pen tha will be used
-  *@param size  [int] : the size of the Mapscale
-  *@return void
-  **/
-  void drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
-  /**
-  *@brief draws The mapOrientation with a spesific color in a spesific point
-  *@detail the length of the arrow is decided by the size of the checker
-  *@param coords [Eigen::Vector2f] : The coordinates of the The mapOrientation(the point each line meets)
-  *@param color [std::string] : The color the mapOrientation
-  *@param width [int] : the width of the pen tha will be used
-  *@return void
-  **/
-  void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
-    const int& width, QPainter* geotiffPainter);
-
-
-  std::map<std::string,QColor> colorMap; //!< A Map that corelates all the colors name to string Colors
+    
+    virtual void drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,const int& grid_space = 0);
+    virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
+       const std::string& shape,const int& sequence ,const int& size);
+    virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color);
   
-// I declare these As pointers In case the are moved in another Class :)
-  QImage* geotiffBackgroundIm_; //!< The background Im
-  QImage* geotiffMapIm_; //!< The MapIm
-  QImage* geotiffFinalIm_; //!< The MapIm+BackgroundIm
-  QString missionName_; //!< The MissionName
-  QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
-  QApplication* app;
-  int fake_argc_;
-  char** fake_argv_;
-
-  int CHECKER_SIZE;
-  int MAP_OFFSET;
-  std::string CHECKER_COLOR_LIGHT;
-  std::string CHECKER_COLOR_DARK;
-  Eigen::Vector2i MISSION_NAME_COORDS;
-  std::string MISSION_NAME_COLOR;
-  int MISSION_NAME_WIDTH;
-  Eigen::Vector2i MAP_SCALE_COORDS;
-  std::string MAP_SCALE_COLOR;
-  int MAP_SCALE_WIDTH;
-  Eigen::Vector2i MAP_ORIENTATION_COORDS;
-  std::string MAP_ORIENTATION_COLOR;
-  int MAP_ORIENTATION_WIDTH;
-  int MAP_ORIENTATION_LENGTH;
+  private:
   
-
-
-
-};
+    void geotiffTimerCb(const ros::TimerEvent& event);
+    /**
+    *@brief drawsTheCheckers of specified size and,color ,
+    *@param colorD [&std::string] : The Dark Color of the checkers
+    *@param colorL [&std::string] : The Light Color of the Checkers
+    *@param checkerSize [&std::string] : The size of the Checkers
+    *@return void
+    **/
+    void drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter);
+    /**
+    *@brief draws The missionName with a spesific color in a spesific point
+    *@param coords [&Eigen::Vector2f] : The coordinates of the Mission Name
+    *@param color [&std::string] : The color the Mission name is painted
+    *@param width [int ] : the width of the pen tha will be used
+    *@return void
+    **/
+    void drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
+    /**
+    *@brief draws The mapScale with a spesific color in a spesific point
+    *@param coords [&Eigen::Vector2f] : The coordinates of the mapscale
+    *@param color [&std::string] : The color the mapScale
+    *@param width [int] : the width of the pen tha will be used
+    *@param size  [int] : the size of the Mapscale
+    *@return void
+    **/
+    void drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
+    /**
+    *@brief draws The mapOrientation with a spesific color in a spesific point
+    *@detail the length of the arrow is decided by the size of the checker
+    *@param coords [Eigen::Vector2f] : The coordinates of the The mapOrientation(the point each line meets)
+    *@param color [std::string] : The color the mapOrientation
+    *@param width [int] : the width of the pen tha will be used
+    *@return void
+    **/
+    void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
+      const int& width, QPainter* geotiffPainter);
+  
+  
+    std::map<std::string,QColor> colorMap; //!< A Map that corelates all the colors name to string Colors
+    
+  // I declare these As pointers In case the are moved in another Class :)
+    QImage* geotiffBackgroundIm_; //!< The background Im
+    QImage* geotiffMapIm_; //!< The MapIm
+    QImage* geotiffFinalIm_; //!< The MapIm+BackgroundIm
+    QString missionName_; //!< The MissionName
+    QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
+    
+    QApplication* app;
+    int fake_argc_;
+    char** fake_argv_;
+  
+    int CHECKER_SIZE;
+    int MAP_OFFSET;
+    std::string CHECKER_COLOR_LIGHT;
+    std::string CHECKER_COLOR_DARK;
+    Eigen::Vector2i MISSION_NAME_COORDS;
+    std::string MISSION_NAME_COLOR;
+    int MISSION_NAME_WIDTH;
+    Eigen::Vector2i MAP_SCALE_COORDS;
+    std::string MAP_SCALE_COLOR;
+    int MAP_SCALE_WIDTH;
+    Eigen::Vector2i MAP_ORIENTATION_COORDS;
+    std::string MAP_ORIENTATION_COLOR;
+    int MAP_ORIENTATION_WIDTH;
+    int MAP_ORIENTATION_LENGTH;
+  
+  };
 
 }// namespace pandora_geotiff
 

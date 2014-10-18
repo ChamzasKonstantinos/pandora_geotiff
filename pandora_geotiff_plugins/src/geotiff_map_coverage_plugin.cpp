@@ -53,7 +53,8 @@ void MapCoverageWriter::initialize(const std::string& name)
   std::string map_coverage_topic_name_;
 
   plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/occupancyGridMap"));
-  plugin_nh.param("/published_topic_names/coverage_map", map_coverage_topic_name_, std::string("/data_fusion/sensor_coverage/coverage_map"));
+  plugin_nh.param("/published_topic_names/coverage_map", map_coverage_topic_name_,
+    std::string("/data_fusion/sensor_coverage/coverage_map"));
   
 
   map_sub = plugin_nh.subscribe(map_topic_name_,
