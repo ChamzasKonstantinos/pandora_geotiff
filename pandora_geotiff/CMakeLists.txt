@@ -37,7 +37,11 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories( pandora_geotiff/include   ${catkin_INCLUDE_DIRS})
+include_directories(include include/pandora_geotiff)
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
+
 
 add_library(geotiff_creator src/geotiff_creator.cpp)
 target_link_libraries(geotiff_creator ${catkin_LIBRARIES} ${QT_LIBRARIES})

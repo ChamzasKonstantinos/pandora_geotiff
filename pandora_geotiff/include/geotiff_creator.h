@@ -45,7 +45,7 @@
 #include "map_creator_interface.h"
 
 
-//~ namespace pandora_geotiff{
+namespace pandora_geotiff{
   
 class GeotiffCreator : public MapWriterInterface
 {
@@ -119,7 +119,7 @@ private:
   *@return void
   **/
   void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
-    const int& width, const int& lineLength , QPainter* geotiffPainter);
+    const int& width, QPainter* geotiffPainter);
 
 
   std::map<std::string,QColor> colorMap; //!< A Map that corelates all the colors name to string Colors
@@ -127,9 +127,9 @@ private:
 // I declare these As pointers In case the are moved in another Class :)
   QImage* geotiffBackgroundIm_; //!< The background Im
   QImage* geotiffMapIm_; //!< The MapIm
-  QImage* geotiffFinalIm_;//!< The MapIm+BackgroundIm
-  QString missionName_;//!< The MissionName
-  QString missionNamePrefix_//!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
+  QImage* geotiffFinalIm_; //!< The MapIm+BackgroundIm
+  QString missionName_; //!< The MissionName
+  QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
 
   int CHECKER_SIZE;
   int MAP_OFFSET;
@@ -151,7 +151,7 @@ private:
 
 };
 
-//~ }// namespace pandora_geotiff
+}// namespace pandora_geotiff
 
 
 #endif

@@ -69,7 +69,7 @@ public:
 *@param size [int] : Size of the objects.Diameter for circles,sides for Diamonds and  special_object  
 *@return void
 **/
-  virtual void drawObjectOfInterest(const Eigen::Vector2f& coords,const std::string& color,
+  virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
     const std::string& shape,const int& sequence ,const int& size) = 0;
 /**
 *@brief Draws A trajectory of a specified color 
@@ -78,7 +78,7 @@ public:
 *@param color [&std::string] : The color each Object is painted
 *@return void
 **/
-  virtual void drawPath( const std::vector<Eigen::Vector2f>& points, const std::string& color) = 0;
+  virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color) = 0;
 };
 
 
