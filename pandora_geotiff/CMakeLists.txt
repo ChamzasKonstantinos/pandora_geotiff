@@ -37,26 +37,23 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(include include/pandora_geotiff)
-include_directories(
-  ${catkin_INCLUDE_DIRS}
-)
+include_directories( pandora_geotiff/include   ${catkin_INCLUDE_DIRS})
 
-add_library(GeotiffCreator src/GeotiffCreator.cpp)
-target_link_libraries(GeotiffCreator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies(GeotiffCreator  ${catkin_EXPORTED_TARGETS})
+add_library(geotiff_creator src/geotiff_creator.cpp)
+target_link_libraries(geotiff_creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
+add_dependencies(geotiff_creator  ${catkin_EXPORTED_TARGETS})
 
-add_library( map_generator src/map_generator.cpp)
-target_link_libraries(map_generator  GeotiffCreator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies( map_generator   GeotiffCreator${catkin_EXPORTED_TARGETS})
-
-add_executable(geotiff_node src/pandora_geotiff_node.cpp)
-target_link_libraries(geotiff_node   
-      ${catkin_LIBRARIES}
-      GeotiffCreator
-      map_generator
-      )
-
-add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
-target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
-
+#~ add_library( map_generator src/map_generator.cpp)
+#~ target_link_libraries(map_generator  GeotiffCreator ${catkin_LIBRARIES} ${QT_LIBRARIES})
+#~ add_dependencies( map_generator   GeotiffCreator${catkin_EXPORTED_TARGETS})
+#~ 
+#~ add_executable(geotiff_node src/pandora_geotiff_node.cpp)
+#~ target_link_libraries(geotiff_node   
+      #~ ${catkin_LIBRARIES}
+      #~ GeotiffCreator
+      #~ map_generator
+      #~ )
+#~ 
+#~ add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
+#~ target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
+#~ 

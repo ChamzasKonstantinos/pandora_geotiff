@@ -38,15 +38,14 @@
 
 #ifndef GeotiffCreator_H
 #define GeotiffCreator_H
-#include <vector>
 #include <QtGui>
 #include <QAction>
 #include "ros/ros.h"
 #include <ros/callback_queue.h>
-#include "map_writer_interface.h"
+#include "map_creator_interface.h"
 
 
-namespace pandora_geotiff{
+//~ namespace pandora_geotiff{
   
 class GeotiffCreator : public MapWriterInterface
 {
@@ -74,6 +73,12 @@ public:
   *@brief sets the MissionName
   **/
   void setMissionName(std::string missionName);
+
+  
+  virtual void drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color,const int& grid_space = 0);
+  virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
+     const std::string& shape,const int& sequence ,const int& size);
+  virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color);
 
 private:
 
@@ -107,26 +112,24 @@ private:
   void drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
   /**
   *@brief draws The mapOrientation with a spesific color in a spesific point
+  *@detail the length of the arrow is decided by the size of the checker
   *@param coords [Eigen::Vector2f] : The coordinates of the The mapOrientation(the point each line meets)
   *@param color [std::string] : The color the mapOrientation
-  *@param penWidth [int] : the width of the pen tha will be used
-  *@param lineLength [int] : the length of each Line
+  *@param width [int] : the width of the pen tha will be used
   *@return void
   **/
   void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
-    const int& penWidth, const int& lineLength , QPainter* geotiffPainter);
+    const int& width, const int& lineLength , QPainter* geotiffPainter);
 
-  virtual void drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color,const int& grid_space = 0);
-  virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
-     const std::string& shape,const int& sequence ,const int& size);
-  virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color);
 
   std::map<std::string,QColor> colorMap; //!< A Map that corelates all the colors name to string Colors
+  
 // I declare these As pointers In case the are moved in another Class :)
   QImage* geotiffBackgroundIm_; //!< The background Im
   QImage* geotiffMapIm_; //!< The MapIm
   QImage* geotiffFinalIm_;//!< The MapIm+BackgroundIm
   QString missionName_;//!< The MissionName
+  QString missionNamePrefix_//!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
 
   int CHECKER_SIZE;
   int MAP_OFFSET;
@@ -148,7 +151,7 @@ private:
 
 };
 
-}// namespace pandora_geotiff
+//~ }// namespace pandora_geotiff
 
 
 #endif
