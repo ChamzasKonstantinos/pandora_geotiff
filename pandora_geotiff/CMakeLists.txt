@@ -61,3 +61,8 @@ add_dependencies(geotiff_creator  ${catkin_EXPORTED_TARGETS})
 #~ add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
 #~ target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
 #~ 
+
+
+if(CATKIN_ENABLE_TESTING)
+  add_subdirectory(test)
+endif()

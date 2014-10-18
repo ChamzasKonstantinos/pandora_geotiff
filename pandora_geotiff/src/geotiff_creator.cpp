@@ -42,6 +42,11 @@ namespace pandora_geotiff{
   
   GeotiffCreator::GeotiffCreator()
   {
+
+    fake_argc_ = 0;
+    //Create a QApplication cause otherwise drawing text will crash
+    app = new QApplication(fake_argc_, fake_argv_, false);
+  
     geotiffBackgroundIm_ = NULL;
     geotiffMapIm_= new QImage(200,200,QImage::Format_RGB32);
     geotiffFinalIm_ = NULL;
@@ -57,10 +62,10 @@ namespace pandora_geotiff{
     MISSION_NAME_WIDTH = 2;
     MAP_SCALE_COORDS = Eigen::Vector2i(CHECKER_SIZE/2, CHECKER_SIZE*2);
     MAP_SCALE_COLOR = "DARK_BLUE_M";
-    MAP_SCALE_WIDTH = 4;
+    MAP_SCALE_WIDTH = 2;
     MAP_ORIENTATION_COORDS =Eigen::Vector2i(CHECKER_SIZE*2, CHECKER_SIZE*2);
     MAP_ORIENTATION_COLOR = "DARK_BLUE_M"; 
-    MAP_ORIENTATION_WIDTH = 4 ;
+    MAP_ORIENTATION_WIDTH = 2 ;
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
     
     colorMap["DARK_BLUE_F"]     = QColor(0, 44, 207);
@@ -127,8 +132,8 @@ namespace pandora_geotiff{
            gridBrush.setColor(colorMap[colorD]);
            }
         else{
-          geotiffPainter->setPen(colorMap[colorD]);
-          gridBrush.setColor(colorMap[colorD]);
+          geotiffPainter->setPen(colorMap[colorL]);
+          gridBrush.setColor(colorMap[colorL]);
           }
         geotiffPainter->drawRect(i*CHECKER_SIZE, j*CHECKER_SIZE, CHECKER_SIZE, CHECKER_SIZE);
         geotiffPainter->fillRect(i*CHECKER_SIZE, j*CHECKER_SIZE, CHECKER_SIZE, CHECKER_SIZE, gridBrush);
@@ -162,7 +167,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      geotiffPainter->setPen(Pen);
     // Drawing the main length unit side
      QPoint Point1(coords.x(), coords.y());
-     QPoint Point2(coords.x(), coords.y() + CHECKER_SIZE);
+     QPoint Point2(coords.x(), coords.y() - CHECKER_SIZE);
   
      geotiffPainter->drawLine(Point1, Point2);
      //Drawing the  length unit up side (1/12 of the checker size)
@@ -176,7 +181,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      geotiffPainter->drawLine(Point1Down, Point2Down);
 
      //Draw the length unit point 1m 
-     QPointF TextPoint(Point1.x() + CHECKER_SIZE*3/50, Point1.y() + CHECKER_SIZE*(3/5));
+     QPointF TextPoint(Point1.x() + CHECKER_SIZE*3/50, Point1.y() - (CHECKER_SIZE*3)/5);
      QString Text("1m");
      geotiffPainter->drawText(TextPoint, Text);
 
@@ -204,7 +209,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      geotiffPainter->drawLine(pointY, pointYdown);
 
      //Drawing The X arrow
-     QPoint pointXup(pointX.x() + CHECKER_SIZE/10, pointX.y() - CHECKER_SIZE/10);
+     QPoint pointXup(pointX.x() - CHECKER_SIZE/10, pointX.y() + CHECKER_SIZE/10);
      QPoint pointXdown(pointX.x() + CHECKER_SIZE/10, pointX.y() + CHECKER_SIZE/10);
      geotiffPainter->drawLine(pointX, pointXup);
      geotiffPainter->drawLine(pointX, pointXdown);
@@ -215,11 +220,11 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      geotiffPainter->drawText(pointYText, YString);
 
      //Drawing X
-     QPoint pointXText(pointX.x() + CHECKER_SIZE/5, pointX.y() - CHECKER_SIZE/6);
+     QPoint pointXText(pointX.x() + CHECKER_SIZE/5, pointX.y() + CHECKER_SIZE/6);
      QString XString("X");
      geotiffPainter->drawText(pointXText, XString);
 
-     
+     ROS_INFO("MapOrientation drawed succesfully");
    }
   
   void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid &map,const std::string& color,const int& grid_space)

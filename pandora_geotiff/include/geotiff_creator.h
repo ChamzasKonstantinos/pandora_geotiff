@@ -82,7 +82,7 @@ public:
 
 private:
 
-  ros::NodeHandle _handle;
+  //~ ros::NodeHandle _handle;
 
   void geotiffTimerCb(const ros::TimerEvent& event);
   /**
@@ -130,6 +130,9 @@ private:
   QImage* geotiffFinalIm_; //!< The MapIm+BackgroundIm
   QString missionName_; //!< The MissionName
   QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
+  QApplication* app;
+  int fake_argc_;
+  char** fake_argv_;
 
   int CHECKER_SIZE;
   int MAP_OFFSET;
