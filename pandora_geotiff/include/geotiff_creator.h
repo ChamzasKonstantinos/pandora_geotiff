@@ -74,10 +74,10 @@ namespace pandora_geotiff{
     void setMissionName(std::string missionName);
   
     
-    virtual void drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,const int& grid_space = 0);
-    virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
-       const std::string& shape,const int& sequence ,const int& size);
-    virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color);
+    virtual void drawMap(const nav_msgs::OccupancyGrid& map, const std::string& color, const int& grid_space = 0);
+    virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color, const std::string& txtcolor,
+       const std::string& shape, const std::string& txt, const int& size);
+    virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color, const int& width);
   
   private:
   

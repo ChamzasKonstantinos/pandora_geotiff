@@ -53,8 +53,16 @@ namespace pandora_geotiff
           map = map_loader::loadMap(
               ros::package::getPath("pandora_geotiff") +
               "/test/test_maps/map1.yaml");
-        }
+
+          points.resize(250);
+          
+          for (int i = 0; i<251; i ++ )
+            {
+              points[i] = Eigen::Vector2i(i+20,i+50);
+            }
+          }
         /*Variables*/
+        std::vector<Eigen::Vector2i> points;
         GeotiffCreator gc;
         nav_msgs::OccupancyGrid map;
     };
@@ -63,8 +71,13 @@ namespace pandora_geotiff
     
     TEST_F(GeotiffCreatorTest, createBackgroundIm)
     {
-
+      
       gc.drawMap(map,"MAGENTA");
+      gc.drawPath(points,"SOLID_ORANGE",3);
+      gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
+      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MIN","DIAMOND","5wrgergertgertgert",100);
+      gc.drawObjectOfInterest(Eigen::Vector2i(450,350),"SOLID_BLUE","WHITE_MAX","CIRCLE","5rstgsregerrgtwrgt",20);
+      gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",50);
       gc.createBackgroundIm();
       gc.saveGeotiff();
     }

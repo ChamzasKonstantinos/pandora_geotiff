@@ -48,7 +48,7 @@ namespace pandora_geotiff{
     app = new QApplication(fake_argc_, fake_argv_, false);
   
     geotiffBackgroundIm_ = NULL;
-    geotiffMapIm_= new QImage(200,200,QImage::Format_RGB32);
+    geotiffMapIm_= new QImage(200,200,QImage::Format_ARGB32);
     geotiffFinalIm_ = NULL;
     missionName_ = QString("TestMission");
     missionNamePrefix_ = QString("/RRL_2015_PANDORA_");
@@ -222,6 +222,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      QString YString("y");
      geotiffPainter->drawText(pointYText, YString);
 
+
+
      //Drawing X
      QPoint pointXText(pointX.x() + CHECKER_SIZE/5, pointX.y() + CHECKER_SIZE/6);
      QString XString("X");
@@ -233,8 +235,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
   void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,const int& grid_space)
   {
     
-    int xRsize = int(((map.info.height+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE);
-    int yRsize = int(((map.info.width+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE);
+    int xRsize = int(((map.info.height+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE)+500;
+    int yRsize = int(((map.info.width+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE)+500;
 
     int xsize = (map.info.height);
     int ysize = (map.info.width);
@@ -252,70 +254,91 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     mapPainter->setPen(Pen);
 
     for(int i=0; i<xsize; i++){
+      
       for(int j=0; j<ysize; j++){
+        
         if(map.data[j*ysize + i] >20 ){
 
           mapPainter->drawPoint(i,ysize-j-1);
       }
     }
   }
+    mapPainter->end();
 }
   
-  void GeotiffCreator::drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color)
-  {
-    //~ QPainter mapPainter;
-    //~ mapPainter.begin(mapIm_);
-  //~ 
-   
-  //~ 
-    //~ for(int i=0; i<points.size()-1; i++){
-     //~ mapPainter.drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
-    //~ }Color pathColor;
-    //~ pathColor.setRgb(120,0,140);
-    //~ QPen pathPen(pathColor);
-    //~ pathPen.setWidth(2);
-    //~ mapPainter.setPen(pathPen);
-  //~ 
-    //~ for(int i=0; i<points.size()-1; i++){
-     //~ mapPainter.drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
-    //~ }
-  }
-  
-  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,
-     const std::string& shape,const int& sequence ,const int& size)
+  void GeotiffCreator::drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color, const int& width)
   {
 
-    //~ QPainter mapPainter;
-    //~ mapPainter.begin(mapIm_);
-//~ 
-    //~ QImage objectIm(40, 40, QImage::Format_ARGB32);
-    //~ QPainter objectPainter;
-//~ 
-    //~ QColor objectColor;
-    //~ objectColor.setRgb(color.r,color.g,color.b);
-//~ 
-    //~ objectPainter.begin(&objectIm);
-//~ 
-    //~ objectPainter.setCompositionMode(QPainter::CompositionMode_Source);
-    //~ objectPainter.fillRect(objectIm.rect(), Qt::transparent);
-    //~ objectPainter.setCompositionMode(QPainter::CompositionMode_SourceOver);
-//~ 
-    //~ objectPainter.setPen(objectColor);
-//~ 
-    //~ int x = 20;
-    //~ int y = 20;
-//~ 
-    //~ for(int iter=0; iter<10; iter++){
-      //~ for(int k=x-iter; k<=x+iter; k++){
-        //~ objectPainter.drawPoint(k, y-(10-iter));
-      //~ }
+    QPainter* pathPainter= new QPainter();
+    pathPainter->begin(geotiffMapIm_);
+
+    QPen Pen = QPen(colorMap[color]);
+    pathPainter->setPen(Pen);
+  
+  
+    for(int i = 0; i < points.size()-1; i++){
+      
+      pathPainter->drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
+    }
+
+    pathPainter->end();
+   
+  }
+  
+  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2i& coords, const std::string& color, const std::string& txtcolor,
+     const std::string& shape,const std::string& txt , const int& size)
+  {
+    
+    QPainter* objectPainter = new QPainter();
+    objectPainter->begin(geotiffMapIm_);
+    
+    objectPainter->setPen(colorMap[color]);
+    objectPainter->setBrush(colorMap[color]);
+
+    QPen Pen(colorMap[txtcolor]);
+
+    if (shape == "DIAMOND"){
+
+      QPoint points[4];
+      points[0] = QPoint(coords.x(), coords.y()+size/2);
+      points[1] = QPoint(coords.x()+size/2, coords.y());
+      points[2] = QPoint(coords.x(), coords.y()-size/2);
+      points[3] = QPoint(coords.x()-size/2, coords.y());
+      objectPainter->drawPolygon(points, 4);
+
+      objectPainter->setPen(Pen);
+      objectPainter->drawText(coords.x(),coords.y(),QString::fromStdString(txt));
+    }
+
+    else if( shape =="CIRCLE"){
+      
+      objectPainter->drawEllipse(coords.x(), coords.y(), size, size);
+      
+      objectPainter->setPen(Pen);
+      objectPainter->drawText(coords.x(),coords.y(),QString::fromStdString(txt));
+    }
+
+    else if (shape =="ARROW")
+    {
+      QPoint points[4];
+      points[0] = QPoint(coords.x()+3*size,coords.y());
+      points[1] = QPoint(coords.x()-2*size, coords.y() -size);
+      points[2] = QPoint(coords.x()-size, coords.y());
+      points[3] = QPoint(coords.x()-2*size ,coords.y()+size);
+      objectPainter->drawPolygon(points, 4);
+    }
+
+    else
+    {
+
+      ROS_INFO("THIS SHAPE is not supported");
+    }
+
+    objectPainter->end();
+
+      
     //~ }
-    //~ for(int iter=0; iter<=10; iter++){
-      //~ for(int k=x-iter; k<=x+iter; k++){
-        //~ objectPainter.drawPoint(k, y+(10-iter));
-        //~ }
-    //~ }
-//~ 
+
     //~ QPen penWhite(Qt::white);
     //~ penWhite.setWidth(2);
     //~ objectPainter.setPen(penWhite);
@@ -324,9 +347,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
 //~ 
     //~ QPoint ObjectPoint(coords.x(), coords.y());
     //~ mapPainter.drawImage(ObjectPoint, objectIm);
-
-
-     //~ int robotx = points[0].x();
+//~ 
+    //~ int robotx = points[0].x();
     //~ int roboty = points[0].y();
     //~ QColor initPoseColor;
     //~ initPoseColor.setRgb(255, 200, 0);
