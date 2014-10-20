@@ -260,9 +260,9 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
         if(map.data[j*ysize + i] >20 ){
 
           mapPainter->drawPoint(i,ysize-j-1);
+        }
       }
     }
-  }
     mapPainter->end();
 }
   
@@ -273,6 +273,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     pathPainter->begin(geotiffMapIm_);
 
     QPen Pen = QPen(colorMap[color]);
+    Pen.setWidth(width);
     pathPainter->setPen(Pen);
   
   
@@ -291,14 +292,19 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     
     QPainter* objectPainter = new QPainter();
     objectPainter->begin(geotiffMapIm_);
+
     
     objectPainter->setPen(colorMap[color]);
     objectPainter->setBrush(colorMap[color]);
 
     QPen Pen(colorMap[txtcolor]);
+    QFont font;
+    font.setPixelSize(size/2);
 
     if (shape == "DIAMOND"){
 
+
+      
       QPoint points[4];
       points[0] = QPoint(coords.x(), coords.y()+size/2);
       points[1] = QPoint(coords.x()+size/2, coords.y());
@@ -307,15 +313,19 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
       objectPainter->drawPolygon(points, 4);
 
       objectPainter->setPen(Pen);
-      objectPainter->drawText(coords.x(),coords.y(),QString::fromStdString(txt));
+      objectPainter->setFont(font);
+      objectPainter->drawText(coords.x()-size/2,coords.y()-size/2,size,size,
+        Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if( shape =="CIRCLE"){
       
-      objectPainter->drawEllipse(coords.x(), coords.y(), size, size);
-      
+      objectPainter->drawEllipse(QPoint(coords.x(),coords.y()), size/2, size/2);
+
+      objectPainter->setFont(font);
       objectPainter->setPen(Pen);
-      objectPainter->drawText(coords.x(),coords.y(),QString::fromStdString(txt));
+      objectPainter->drawText(coords.x()-size/2,coords.y()-size/2,size,size,
+        Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if (shape =="ARROW")

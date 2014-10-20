@@ -75,9 +75,9 @@ namespace pandora_geotiff
       gc.drawMap(map,"MAGENTA");
       gc.drawPath(points,"SOLID_ORANGE",3);
       gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
-      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MIN","DIAMOND","5wrgergertgertgert",100);
-      gc.drawObjectOfInterest(Eigen::Vector2i(450,350),"SOLID_BLUE","WHITE_MAX","CIRCLE","5rstgsregerrgtwrgt",20);
-      gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",50);
+      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",135);
+      gc.drawObjectOfInterest(Eigen::Vector2i(350,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",130);
+      gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",10);
       gc.createBackgroundIm();
       gc.saveGeotiff();
     }
