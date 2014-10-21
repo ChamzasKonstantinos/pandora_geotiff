@@ -47,9 +47,7 @@ MapGenerator::MapGenerator(): geotiffCreator(new GeotiffCreator), plugin_loader_
       plugin_vector_[i]->draw(geotiffCreator);
     }
     
-    geotiffCreator->onCreateGeotiffClicked();
-    geotiffCreator->inCreateGeotiffClicked();
-    
+    geotiffCreator->createBackgroundIm();   
     geotiffCreator->saveGeotiff();
 }
 

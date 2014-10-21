@@ -92,9 +92,9 @@ namespace pandora_geotiff{
     void drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter);
     /**
     *@brief draws The missionName with a spesific color in a spesific point
-    *@param coords [&Eigen::Vector2f] : The coordinates of the Mission Name
+    *@param coords [&Eigen::Vector2i] : The coordinates of the Mission Name
     *@param color [&std::string] : The color the Mission name is painted
-    *@param width [int ] : the width of the pen tha will be used
+    *@param width [&int ] : the width of the pen tha will be used
     *@return void
     **/
     void drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
@@ -128,9 +128,10 @@ namespace pandora_geotiff{
     QString missionName_; //!< The MissionName
     QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
     
-    QApplication* app;
+    QApplication* app_;
     int fake_argc_;
     char** fake_argv_;
+    bool mapInitialized_;
   
     int CHECKER_SIZE;
     int MAP_OFFSET;
