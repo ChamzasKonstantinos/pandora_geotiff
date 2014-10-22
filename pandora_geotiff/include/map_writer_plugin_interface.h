@@ -29,18 +29,18 @@
 #ifndef _MAPWRITERPLUGININTERFACE_H__
 #define _MAPWRITERPLUGININTERFACE_H__
 
-#include "map_writer_interface.h"
+#include "map_creator_interface.h"
 
 namespace pandora_geotiff{
-
-class MapWriterPluginInterface{
-
-public:
-
-  virtual void initialize(const std::string& name) = 0;
-  virtual void draw(MapWriterInterface* map_writer_interface) = 0;
-
-};
+  
+  class MapWriterPluginInterface{
+  
+  public:
+  
+    virtual void initialize(const std::string& name) = 0;
+    virtual void draw(MapWriterInterface* map_writer_interface) = 0;
+  
+  };
 
 } //namespace pandora_geotiff
 

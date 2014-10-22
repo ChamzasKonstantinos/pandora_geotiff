@@ -233,7 +233,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
      ROS_INFO("MapOrientation drawed succesfully");
    }
 
-  void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,const int& grid_space)
+  void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,
+    const int& bottomThres,const int& topThres, const int& grid_space)
   {
 
     ROS_INFO("A map drawing was requested");
@@ -244,34 +245,45 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     int xsize = (map.info.height);
     int ysize = (map.info.width);
 
-    if (not mapInitialized_){
-      geotiffMapIm_ = new QImage(xsize,ysize, QImage::Format_ARGB32);
-      }
-
     QPainter* mapPainter = new QPainter();
-    mapPainter->begin(geotiffMapIm_);
+    
+    if (not mapInitialized_){
+  
+      geotiffMapIm_ = new QImage(xsize,ysize, QImage::Format_ARGB32);
+      mapInitialized_ = true;
+      ROS_ERROR("AAAAAAA");
+      mapPainter->begin(geotiffMapIm_);
+      mapPainter->setCompositionMode(QPainter::CompositionMode_Source);
+      mapPainter->fillRect(geotiffMapIm_->rect(), Qt::transparent);
+      mapPainter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+              }
 
-    mapPainter->setCompositionMode(QPainter::CompositionMode_Source);
-    mapPainter->fillRect(geotiffMapIm_->rect(), Qt::transparent);
-    mapPainter->setCompositionMode(QPainter::CompositionMode_SourceOver);
+    else{
+      mapPainter->begin(geotiffMapIm_);
+    }
 
     QColor MapColor(colorMap[color]);
+    QPen Pen = QPen(MapColor);
+    mapPainter->setPen(Pen);
 
     for(int i=0; i<xsize; i++){
-
       for(int j=0; j<ysize; j++){
+        if((bottomThres < map.data[j*ysize + i])&&(map.data[j*ysize + i] <topThres)){
 
-        if(map.data[j*ysize + i] >20 ){
-          //THIS CODE HERE IS USED TO DEMONSTRATE THE DYNAMIC CHANGING CAPABILITIES OF THIS DRAWING
+          bool yGrid = !(j%(CHECKER_SIZE/2));
+          bool xGrid = !(i%(CHECKER_SIZE/2));
 
-          MapColor.setRgb((MapColor.red()+1)%255, (MapColor.green()+1)%255, (MapColor.blue()+1)%255);
-          QPen Pen = QPen(MapColor);
-          mapPainter->setPen(Pen);
+           if (grid_space && (xGrid or yGrid)){
+             mapPainter->setPen(QPen(colorMap["WHITE_MIN"]));
+             //~ ROS_ERROR("DATA%d",map.data[j*ysize + i]);
+           }
 
           mapPainter->drawPoint(i,ysize-j-1);
-        }
+          mapPainter->setPen(Pen);
+          
+            }
+          }
       }
-    }
     mapPainter->end();
     ROS_INFO("Map was drawed succesfully");
 }

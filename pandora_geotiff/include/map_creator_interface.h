@@ -63,7 +63,8 @@ namespace pandora_geotiff
   *@param grid_space [int ] :The space between the lines in the grid .If 0 then no grid is drawed 
   *@return void
   **/
-    virtual void drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,const int& grid_space = 0 ) = 0;
+    virtual void drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,
+       const int& bottomThres,const int& topThres,const int& grid_space = 0 ) = 0;
   /**
   *@brief Draws an Object with a specific color and a specific shape
   *@details possible shapes {Diamond,Circle,Initial Arrow}

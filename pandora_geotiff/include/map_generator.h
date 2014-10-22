@@ -12,30 +12,30 @@
 #include <QtGui/QApplication>
 
 #include "pandora_geotiff/SaveMission.h"
-#include "GeotiffCreator.h"
+#include "geotiff_creator.h"
 #include <map_writer_plugin_interface.h>
 
 
 class MapGenerator
 {
-private:  
-
-  GeotiffCreator * geotiffCreator;
-
-  std::string p_plugin_list_;
-  ros::NodeHandle pn_;
-  ros::ServiceServer save_mission_service;
-  std::vector<boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> > plugin_vector_;
-  pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>* plugin_loader_;
+  private:  
   
+    pandora_geotiff::GeotiffCreator* geotiffCreator;
   
-public:
-  MapGenerator();
-  ~MapGenerator();
-
-  void writeGeotiff();
-  bool saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
-    pandora_geotiff::SaveMission::Response& res );
+    std::string p_plugin_list_;
+    ros::NodeHandle pn_;
+    ros::ServiceServer save_mission_service;
+    std::vector<boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> > plugin_vector_;
+    pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>* plugin_loader_;
+    
+    
+  public:
+    MapGenerator();
+    ~MapGenerator();
+  
+    void writeGeotiff();
+    bool saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
+      pandora_geotiff::SaveMission::Response& res );
 };
 
   

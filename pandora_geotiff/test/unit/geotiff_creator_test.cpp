@@ -71,12 +71,12 @@ namespace pandora_geotiff
     
     TEST_F(GeotiffCreatorTest, createBackgroundIm)
     {
-      
-      gc.drawMap(map,"MAGENTA");
+      gc.drawMap(map,"YELLOW",-5,5,1);
+      gc.drawMap(map,"MAGENTA",80,110,0);
       gc.drawPath(points,"SOLID_ORANGE",3);
       gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
-      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",135);
-      gc.drawObjectOfInterest(Eigen::Vector2i(350,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",130);
+      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",50);
+      gc.drawObjectOfInterest(Eigen::Vector2i(750,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",100);
       gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",10);
       gc.createBackgroundIm();
       gc.saveGeotiff();

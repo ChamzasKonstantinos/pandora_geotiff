@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_geotiff_plugins)
-find_package(catkin REQUIRED COMPONENTS pandora_geotiff )
+find_package(catkin REQUIRED COMPONENTS pandora_geotiff pandora_data_fusion_msgs)
 
 
 catkin_package(
@@ -23,7 +23,8 @@ include_directories(
 
 
 add_library(pandora_geotiff_plugins
-  src/geotiff_map_coverage_plugin.cpp
+  src/geotiff_map_plugin.cpp
+  src/geotiff_coverage_plugin.cpp
   src/geotiff_path_plugin.cpp
   src/geotiff_objects_plugin.cpp
 )

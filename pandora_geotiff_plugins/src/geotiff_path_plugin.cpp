@@ -1,32 +1,41 @@
-//=================================================================================================
-// Copyright (c) 2012, Gregor Gebhardt, TU Darmstadt
-// All rights reserved.
-
-// Redistribution and use in source and binary forms, with or without
-// modification, are permitted provided that the following conditions are met:
-//     * Redistributions of source code must retain the above copyright
-//       notice, this list of conditions and the following disclaimer.
-//     * Redistributions in binary form must reproduce the above copyright
-//       notice, this list of conditions and the following disclaimer in the
-//       documentation and/or other materials provided with the distribution.
-//     * Neither the name of the Flight Systems and Automatic Control group,
-//       TU Darmstadt, nor the names of its contributors may be used to
-//       endorse or promote products derived from this software without
-//       specific prior written permission.
-
-// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-// DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY
-// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//=================================================================================================
-
-#include <map_writer_interface.h>
+/*********************************************************************
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors:
+ *   Chamzas Konstantinos <chamzask@gmail.com>
+ *********************************************************************/
+#include <map_creator_interface.h>
 #include <map_writer_plugin_interface.h>
 #include <nav_msgs/Path.h>
 
@@ -41,32 +50,34 @@ using namespace pandora_geotiff;
 
 class PathWriter : public MapWriterPluginInterface
 {
-public:
-  PathWriter();
-  virtual ~PathWriter();
-
-  virtual void initialize(const std::string& name);
-  virtual void draw(MapWriterInterface *interface);
-  void getRobotTrajectoryData(nav_msgs::Path robotPath);
-
-protected:
-  ros::NodeHandle nh_;
-  ros::Subscriber path_sub;
-
-  bool initialized_;
-  std::string name_;
-  bool draw_all_objects_;
-  std::string class_id_;
-
-private:
+  public:
+    PathWriter();
+    virtual ~PathWriter();
   
-  bool gotData;
-  nav_msgs::Path robotPath;
-
-};
+    virtual void initialize(const std::string& name);
+    virtual void draw(MapWriterInterface *interface);
+    void getRobotTrajectoryData(nav_msgs::Path robotPath);
+  
+  protected:
+    ros::NodeHandle nh_;
+    ros::Subscriber path_sub;
+  
+    bool initialized_;
+    std::string name_;
+  
+    private:
+      
+      bool gotData;
+      nav_msgs::Path robotPath;
+      std::string PATH_COLOR;
+      std::string ARROW_COLOR;
+      int ARROW_SIZE;
+      int PATH_WIDTH;
+  
+  };
 
 PathWriter::PathWriter()
-    : initialized_(false)
+    : initialized_(false),gotData(false),PATH_COLOR("MAGENTA"), PATH_WIDTH(4), ARROW_COLOR("YELLOW"), ARROW_SIZE(10)
 {}
 
 PathWriter::~PathWriter()
@@ -77,8 +88,8 @@ void PathWriter::initialize(const std::string& name)
   ros::NodeHandle plugin_nh("~/" + name);
   std::string path_topic_name;
 
-  plugin_nh.param("robot_trajector_topic", path_topic_name, std::string("/robot_trajectory"));
-  
+  plugin_nh.param("robot_trajectory_topic", path_topic_name, std::string("/robot_trajectory"));
+
   path_sub = plugin_nh.subscribe(path_topic_name , 1000, &PathWriter::getRobotTrajectoryData,this);
   initialized_ = true;
   this->name_ = name;
@@ -88,38 +99,42 @@ void PathWriter::initialize(const std::string& name)
 void PathWriter::getRobotTrajectoryData(nav_msgs::Path robotPath)
 {
   this->robotPath = robotPath;
-  ROS_INFO("DATA_PATH_RECEIVED");
-  
+  ROS_INFO("_PATH_DATA_RECEIVED");
+  gotData = true;
     }
 
   
 void PathWriter::draw(MapWriterInterface *interface)
 {
-    if(!initialized_) return;
+    if(!initialized_||!gotData)
+    {
+      ROS_WARN_NAMED("PathWriter","plugin not initilized or no data has been received /n ABORTING DRAWING..");
+      return;
+      }
     
     ROS_INFO("DRAWING THE AWESOME PATH");
     
-    std::vector<geometry_msgs::PoseStamped>& path_vector (robotPath.poses);
+    std::vector<geometry_msgs::PoseStamped>& path_vector(robotPath.poses);
 
     size_t size = path_vector.size();
 
-    std::vector<Eigen::Vector2f> pointVec;
+    std::vector<Eigen::Vector2i> pointVec;
     pointVec.resize(size);
     
-    ROS_INFO("%ld ", size);
-
+    ROS_INFO("Robot path Size %ld ", size);
 
     for (size_t i = 0; i < size; ++i){
       const geometry_msgs::PoseStamped& pose (path_vector[i]);
 
-      pointVec[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
+      pointVec[i] = Eigen::Vector2i(pose.pose.position.x, pose.pose.position.y);
     }
 
     if (size > 0){
-      Eigen::Vector3f startVec(pointVec[0].x(),pointVec[0].y(),0.0f);
-      interface->drawPath(startVec, pointVec);
+
+      interface->drawPath(pointVec,PATH_COLOR,PATH_WIDTH);
+      interface->drawObjectOfInterest(pointVec[0],ARROW_COLOR,"irelevant","ARROW","irelavant",ARROW_SIZE);
     }
-    ROS_INFO("DRAWED THE AWESOME PATH SUCCESFULLY");
+    ROS_INFO("DRAWED A PATH SUCCESFULLY");
     
 }
 
