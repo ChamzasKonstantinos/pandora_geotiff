@@ -58,13 +58,13 @@ namespace pandora_geotiff{
     MAP_OFFSET = 4*CHECKER_SIZE;
     CHECKER_COLOR_LIGHT = "LIGHT_GREY";
     CHECKER_COLOR_DARK =  "DARK_GREY";
-    MISSION_NAME_COORDS =  Eigen::Vector2i(CHECKER_SIZE/2 ,CHECKER_SIZE/2);
+    MISSION_NAME_COORDS =  Eigen::Vector2f(CHECKER_SIZE/2 ,CHECKER_SIZE/2);
     MISSION_NAME_COLOR = "DARK_BLUE_F";
     MISSION_NAME_WIDTH = 2;
-    MAP_SCALE_COORDS = Eigen::Vector2i(CHECKER_SIZE/2, CHECKER_SIZE*2);
+    MAP_SCALE_COORDS = Eigen::Vector2f(CHECKER_SIZE/2, CHECKER_SIZE*2);
     MAP_SCALE_COLOR = "DARK_BLUE_M";
     MAP_SCALE_WIDTH = 2;
-    MAP_ORIENTATION_COORDS =Eigen::Vector2i(CHECKER_SIZE*2, CHECKER_SIZE*2);
+    MAP_ORIENTATION_COORDS =Eigen::Vector2f(CHECKER_SIZE*2, CHECKER_SIZE*2);
     MAP_ORIENTATION_COLOR = "DARK_BLUE_M";
     MAP_ORIENTATION_WIDTH = 2 ;
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
@@ -112,6 +112,7 @@ namespace pandora_geotiff{
   void GeotiffCreator::saveGeotiff(std::string homeFolderString)
   {
     ROS_INFO("Saving Geotiff...");
+    mapInitialized_ = false;
     (*geotiffBackgroundIm_).save(homeFolderString.c_str());
     ROS_INFO("Geotiff... was saved succesfully");
 
@@ -146,7 +147,7 @@ namespace pandora_geotiff{
     ROS_INFO("Checkers were drawed Succesfully!");
     }
 
-  void GeotiffCreator::drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
+  void GeotiffCreator::drawMissionName(const Eigen::Vector2f& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
   {
     ROS_INFO("Drawing MissionName...");
     QPen Pen = QPen(colorMap[color]);
@@ -163,7 +164,7 @@ namespace pandora_geotiff{
     ROS_INFO("MissionName was drawed succesfully");
   }
 
-void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
+void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::string& color, const int& width, QPainter* geotiffPainter)
   {
      ROS_INFO("Drawing MapScale...");
      QPen Pen = QPen(colorMap[color]);
@@ -191,7 +192,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
 
      ROS_INFO("MapScale was drawed succesfully!");
    }
-  void GeotiffCreator::drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
+  void GeotiffCreator::drawMapOrientation(const Eigen::Vector2f& coords,const std::string& color,
     const int& width, QPainter* geotiffPainter)
   {
      ROS_INFO("Drawing MapOrientation...");
@@ -249,9 +250,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     
     if (not mapInitialized_){
   
-      geotiffMapIm_ = new QImage(xsize,ysize, QImage::Format_ARGB32);
+      geotiffMapIm_ = new QImage(xsize+500,ysize+500, QImage::Format_ARGB32);
       mapInitialized_ = true;
-      ROS_ERROR("AAAAAAA");
       mapPainter->begin(geotiffMapIm_);
       mapPainter->setCompositionMode(QPainter::CompositionMode_Source);
       mapPainter->fillRect(geotiffMapIm_->rect(), Qt::transparent);
@@ -265,30 +265,28 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
     QColor MapColor(colorMap[color]);
     QPen Pen = QPen(MapColor);
     mapPainter->setPen(Pen);
-
     for(int i=0; i<xsize; i++){
       for(int j=0; j<ysize; j++){
-        if((bottomThres < map.data[j*ysize + i])&&(map.data[j*ysize + i] <topThres)){
-
+        if((bottomThres < map.data[j + i*ysize])&&(map.data[j + i*ysize] <topThres)){
           bool yGrid = !(j%(CHECKER_SIZE/2));
           bool xGrid = !(i%(CHECKER_SIZE/2));
-
+ 
            if (grid_space && (xGrid or yGrid)){
              mapPainter->setPen(QPen(colorMap["WHITE_MIN"]));
-             //~ ROS_ERROR("DATA%d",map.data[j*ysize + i]);
            }
-
+          
           mapPainter->drawPoint(i,ysize-j-1);
           mapPainter->setPen(Pen);
           
             }
           }
       }
+      
     mapPainter->end();
     ROS_INFO("Map was drawed succesfully");
 }
 
-  void GeotiffCreator::drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color, const int& width)
+  void GeotiffCreator::drawPath( const std::vector<Eigen::Vector2f>& points, const std::string& color, const int& width)
   {
 
     ROS_INFO("A path drawing was requested");
@@ -302,7 +300,10 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
 
     for(int i = 0; i < points.size()-1; i++){
 
-      pathPainter->drawLine(points[i].x(), points[i].y(), points[i+1].x(), points[i+1].y());
+      pathPainter->drawLine(points[i].x()*50+200,  -points[i].y()*50+200, points[i+1].x()*50+200, -points[i+1].y()*50+200);
+      //~ ROS_INFO("Pathx,%d \t",points[i].x());
+      //~ ROS_INFO("Path,%d \t",points[i].y());
+      //~ std::cout<<"Path "<<points[i].x()<<" ";
     }
 
     pathPainter->end();
@@ -311,7 +312,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2i& coords,const std::strin
 
   }
 
-  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2i& coords, const std::string& color, const std::string& txtcolor,
+  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& color, const std::string& txtcolor,
      const std::string& shape,const std::string& txt , const int& size)
   {
 

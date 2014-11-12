@@ -73,7 +73,7 @@ void CoverageWriter::draw(MapWriterInterface *interface)
 {
        if(!initialized_||!gotData)
     {
-      ROS_WARN_NAMED("CoverageWriter","plugin not initilized or no data has been received /n ABORTING DRAWING..");
+      ROS_WARN_NAMED("CoverageWriter","CoverageWriterplugin not initilized or no data has been received /n ABORTING DRAWING..");
       return;
       }
 

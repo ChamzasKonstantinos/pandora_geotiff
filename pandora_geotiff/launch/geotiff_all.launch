@@ -9,13 +9,13 @@
     
     
      <param name="plugins" type="string"
-       value="pandora_geotiff_plugins/MapWriter pandora_geotiff_plugins/CoverageWriter pandora_geotiff_plugins/PathWriter pandora_geotiff_plugins/ObjectsWriter"/>
+       value="pandora_geotiff_plugins/MapWriter pandora_geotiff_plugins/CoverageWriter pandora_geotiff_plugins/PathWriter "/>
 
     <param name = "/published_topic_names/coverage_map" type = "string" value = "/data_fusion/sensor_coverage/coverage_map"/>
     <param name ="/published_topic_names/map" type = "string" value ="/slam/occupancyGridMap"/>
     
     <param name ="COVERAGE_COLOR" type ="string" value ="LIGHT_GREEN_MAX"/>
-    <param name ="WALL_COLOR" type = "string"  value = "MAGENTA"/>
+    <param name ="WALL_COLOR" type = "string"  value = "SOLID BLUE"/>
     <param name ="MAP_COLOR" type = "string" value ="WHITE_MAX"/>
 
 
@@ -23,7 +23,7 @@
     <param name ="COV_TOP_THRES" type = "int" value = "100" />
     
     <param name ="MAP_BOT_THRES" type = "int" value = "0" />
-    <param name ="MAP_TOP_THRES" type = "int" value = "30 "/>
+    <param name ="MAP_TOP_THRES" type = "int" value = "30"/>
     
     <param name ="WALL_BOT_THRES" type = "int" value = "60 "/>
     <param name ="WALL_TOP_THRES" type = "int" value = "250 "/>

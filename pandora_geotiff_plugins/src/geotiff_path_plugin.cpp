@@ -108,7 +108,7 @@ void PathWriter::draw(MapWriterInterface *interface)
 {
     if(!initialized_||!gotData)
     {
-      ROS_WARN_NAMED("PathWriter","plugin not initilized or no data has been received /n ABORTING DRAWING..");
+      ROS_WARN_NAMED("PathWriter","PathWriter plugin not initilized or no data has been received /n ABORTING DRAWING..");
       return;
       }
     
@@ -118,7 +118,7 @@ void PathWriter::draw(MapWriterInterface *interface)
 
     size_t size = path_vector.size();
 
-    std::vector<Eigen::Vector2i> pointVec;
+    std::vector<Eigen::Vector2f> pointVec;
     pointVec.resize(size);
     
     ROS_INFO("Robot path Size %ld ", size);
@@ -126,7 +126,7 @@ void PathWriter::draw(MapWriterInterface *interface)
     for (size_t i = 0; i < size; ++i){
       const geometry_msgs::PoseStamped& pose (path_vector[i]);
 
-      pointVec[i] = Eigen::Vector2i(pose.pose.position.x, pose.pose.position.y);
+      pointVec[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
     }
 
     if (size > 0){

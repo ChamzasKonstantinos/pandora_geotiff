@@ -52,13 +52,13 @@ using namespace pandora_geotiff;
     ros::NodeHandle plugin_nh("~/" + name);
     std::string map_topic_name_;
   
-    plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/occupancyGridMap"));
+    plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/map"));
     plugin_nh.param("MAP_BOT_THRES",MAP_BOT_THRES,0);
     plugin_nh.param("MAP_TOP_THRES",MAP_TOP_THRES,30);
     plugin_nh.param("MAP_COLOR",MAP_COLOR, std::string("WHITE_MAX"));
     plugin_nh.param("WALL_BOT_THRES",WALL_BOT_THRES,60);
     plugin_nh.param("WALL_TOP_THRES",WALL_TOP_THRES,250);
-    plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("MAGENTA"));
+    plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("SOLID BLUE"));
       
     map_sub = plugin_nh.subscribe(map_topic_name_,
          1000,  &MapWriter::getGeotiffDataMap,this);

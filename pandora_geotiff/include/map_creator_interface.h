@@ -75,7 +75,7 @@ namespace pandora_geotiff
   *@param size [int] : Size of the objects.Diameter for circles,sides for Diamonds and  special_object  
   *@return void
   **/
-    virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color,const std::string& txtcolor,
+    virtual void drawObjectOfInterest(const Eigen::Vector2f& coords,const std::string& color,const std::string& txtcolor,
       const std::string& shape,const std::string& txt ,const int& size) = 0;
   /**
   *@brief Draws A trajectory of a specified color 
@@ -84,7 +84,7 @@ namespace pandora_geotiff
   *@param color [&std::string] : The color each Object is painted
   *@return void
   **/
-    virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color, const int& width) = 0;
+    virtual void drawPath( const std::vector<Eigen::Vector2f>& points, const std::string& color, const int& width) = 0;
   };
 }//namespace pandora_geotiff
 

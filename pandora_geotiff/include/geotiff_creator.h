@@ -76,9 +76,9 @@ namespace pandora_geotiff{
     
     virtual void drawMap(const nav_msgs::OccupancyGrid& map, const std::string& color,
       const int& bottomThres,const int& topThres, const int& grid_space = 0);
-    virtual void drawObjectOfInterest(const Eigen::Vector2i& coords,const std::string& color, const std::string& txtcolor,
+    virtual void drawObjectOfInterest(const Eigen::Vector2f& coords,const std::string& color, const std::string& txtcolor,
        const std::string& shape, const std::string& txt, const int& size);
-    virtual void drawPath( const std::vector<Eigen::Vector2i>& points, const std::string& color, const int& width);
+    virtual void drawPath( const std::vector<Eigen::Vector2f>& points, const std::string& color, const int& width);
   
   private:
   
@@ -93,12 +93,12 @@ namespace pandora_geotiff{
     void drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter);
     /**
     *@brief draws The missionName with a spesific color in a spesific point
-    *@param coords [&Eigen::Vector2i] : The coordinates of the Mission Name
+    *@param coords [&Eigen::Vector2f] : The coordinates of the Mission Name
     *@param color [&std::string] : The color the Mission name is painted
     *@param width [&int ] : the width of the pen tha will be used
     *@return void
     **/
-    void drawMissionName(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
+    void drawMissionName(const Eigen::Vector2f& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
     /**
     *@brief draws The mapScale with a spesific color in a spesific point
     *@param coords [&Eigen::Vector2f] : The coordinates of the mapscale
@@ -107,7 +107,7 @@ namespace pandora_geotiff{
     *@param size  [int] : the size of the Mapscale
     *@return void
     **/
-    void drawMapScale(const Eigen::Vector2i& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
+    void drawMapScale(const Eigen::Vector2f& coords,const std::string& color, const int& width, QPainter* geotiffPainter);
     /**
     *@brief draws The mapOrientation with a spesific color in a spesific point
     *@detail the length of the arrow is decided by the size of the checker
@@ -116,7 +116,7 @@ namespace pandora_geotiff{
     *@param width [int] : the width of the pen tha will be used
     *@return void
     **/
-    void drawMapOrientation(const Eigen::Vector2i& coords,const std::string& color,
+    void drawMapOrientation(const Eigen::Vector2f& coords,const std::string& color,
       const int& width, QPainter* geotiffPainter);
   
   
@@ -138,13 +138,13 @@ namespace pandora_geotiff{
     int MAP_OFFSET;
     std::string CHECKER_COLOR_LIGHT;
     std::string CHECKER_COLOR_DARK;
-    Eigen::Vector2i MISSION_NAME_COORDS;
+    Eigen::Vector2f MISSION_NAME_COORDS;
     std::string MISSION_NAME_COLOR;
     int MISSION_NAME_WIDTH;
-    Eigen::Vector2i MAP_SCALE_COORDS;
+    Eigen::Vector2f MAP_SCALE_COORDS;
     std::string MAP_SCALE_COLOR;
     int MAP_SCALE_WIDTH;
-    Eigen::Vector2i MAP_ORIENTATION_COORDS;
+    Eigen::Vector2f MAP_ORIENTATION_COORDS;
     std::string MAP_ORIENTATION_COLOR;
     int MAP_ORIENTATION_WIDTH;
     int MAP_ORIENTATION_LENGTH;
