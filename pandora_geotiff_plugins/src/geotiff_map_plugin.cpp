@@ -71,6 +71,15 @@ using namespace pandora_geotiff;
   void MapWriter::getGeotiffDataMap(nav_msgs::OccupancyGrid map)
   {
     this->map = map;
+    //~ ROS_ERROR("oX%f",map.info.origin.position.x);
+    //~ ROS_ERROR("oY%f",map.info.origin.position.y);
+    //~ ROS_ERROR("oZ%f",map.info.origin.position.z);
+    //~ ROS_ERROR("qX%f",map.info.origin.orientation.x);
+    //~ ROS_ERROR("qY%f",map.info.origin.orientation.y);
+    //~ ROS_ERROR("qZ%f",map.info.origin.orientation.z);
+    //~ ROS_ERROR("qW%f",map.info.origin.orientation.w);
+    //~ ROS_ERROR("frame id %s",map.header.frame_id.c_str());
+    
     gotData = true;
   }
 
@@ -82,7 +91,6 @@ using namespace pandora_geotiff;
       return;
       }
 
-      ROS_ERROR("Drawing the awesome map");
       interface->drawMap(map, MAP_COLOR, MAP_BOT_THRES, MAP_TOP_THRES,1);
       interface->drawMap(map, WALL_COLOR, WALL_BOT_THRES, WALL_TOP_THRES, 0);
   }

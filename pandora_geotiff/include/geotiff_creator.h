@@ -132,8 +132,14 @@ namespace pandora_geotiff{
     QApplication* app_;
     int fake_argc_;
     char** fake_argv_;
+ 
+    // Map parameters
+
+    int mapXoffset_;
+    int mapYoffset_;
+    float  geotiffMapRes_;
     bool mapInitialized_;
-  
+    
     int CHECKER_SIZE;
     int MAP_OFFSET;
     std::string CHECKER_COLOR_LIGHT;
@@ -148,6 +154,10 @@ namespace pandora_geotiff{
     std::string MAP_ORIENTATION_COLOR;
     int MAP_ORIENTATION_WIDTH;
     int MAP_ORIENTATION_LENGTH;
+
+
+
+   
   
   };
 

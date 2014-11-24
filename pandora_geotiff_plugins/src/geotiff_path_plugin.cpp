@@ -127,8 +127,16 @@ void PathWriter::draw(MapWriterInterface *interface)
       const geometry_msgs::PoseStamped& pose (path_vector[i]);
 
       pointVec[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
+      if (i<5)
+      { 
+      ROS_ERROR("PAth frame id %s",robotPath.header.frame_id.c_str());
+      ROS_ERROR("oX%f",pose.pose.position.x);
+      ROS_ERROR("qX%f",pose.pose.orientation.x);
+      ROS_ERROR("qY%f",pose.pose.orientation.y);
     }
-
+    }
+    
+    
     if (size > 0){
 
       interface->drawPath(pointVec,PATH_COLOR,PATH_WIDTH);

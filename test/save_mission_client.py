@@ -17,7 +17,7 @@ class SaveMissionClient():
         except rospy.ServiceException, e:
           print "Service call failed: %s"%e
           
-        print "Service call did not fail"
+        print "Service call succeded"
         return True
    
 if __name__ == "__main__":

@@ -58,11 +58,11 @@ namespace pandora_geotiff
           
           for (int i = 0; i<251; i ++ )
             {
-              points[i] = Eigen::Vector2i(i+20,i+50);
+              points[i] = Eigen::Vector2f(i+20,i+50);
             }
           }
         /*Variables*/
-        std::vector<Eigen::Vector2i> points;
+        std::vector<Eigen::Vector2f> points;
         GeotiffCreator gc;
         nav_msgs::OccupancyGrid map;
     };
@@ -74,10 +74,10 @@ namespace pandora_geotiff
       gc.drawMap(map,"YELLOW",-5,5,1);
       gc.drawMap(map,"MAGENTA",80,110,0);
       gc.drawPath(points,"SOLID_ORANGE",3);
-      gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
-      gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",50);
-      gc.drawObjectOfInterest(Eigen::Vector2i(750,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",100);
-      gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",10);
+      //~ gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
+      //~ gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",50);
+      //~ gc.drawObjectOfInterest(Eigen::Vector2i(750,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",100);
+      //~ gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",10);
       gc.createBackgroundIm();
       gc.saveGeotiff();
     }

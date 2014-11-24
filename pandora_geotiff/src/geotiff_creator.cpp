@@ -48,13 +48,11 @@ namespace pandora_geotiff{
     app_ = new QApplication(fake_argc_, fake_argv_, false);
 
     geotiffBackgroundIm_ = NULL;
-    geotiffMapIm_= new QImage(200,200,QImage::Format_ARGB32);
-    mapInitialized_ = false;
+    CHECKER_SIZE = 50;
     geotiffFinalIm_ = NULL;
     missionName_ = QString("TestMission");
     missionNamePrefix_ = QString("/RRL_2015_PANDORA_");
   // This parameters should be moved in a yaml file
-    CHECKER_SIZE = 50;
     MAP_OFFSET = 4*CHECKER_SIZE;
     CHECKER_COLOR_LIGHT = "LIGHT_GREY";
     CHECKER_COLOR_DARK =  "DARK_GREY";
@@ -68,6 +66,13 @@ namespace pandora_geotiff{
     MAP_ORIENTATION_COLOR = "DARK_BLUE_M";
     MAP_ORIENTATION_WIDTH = 2 ;
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
+  //this parameters must be set from the map plugin tha will always be called first
+    
+    mapXoffset_ = -5;
+    mapYoffset_ = -5;
+    geotiffMapRes_ = 0.02;
+    geotiffMapIm_= new QImage(200,200,QImage::Format_ARGB32);
+    mapInitialized_ = false;
 
     colorMap["DARK_BLUE_F"]     = QColor(0, 44, 207);
     colorMap["DARK_BLUE_M"]     = QColor(0, 50, 120);
@@ -93,7 +98,7 @@ namespace pandora_geotiff{
 
     ROS_INFO("Creating BackGroundIm...");
 
-    geotiffBackgroundIm_= new QImage(geotiffMapIm_->height()+MAP_OFFSET,geotiffMapIm_->width()+MAP_OFFSET, QImage::Format_RGB32);
+    geotiffBackgroundIm_= new QImage(geotiffMapIm_->width()+MAP_OFFSET,geotiffMapIm_->height()+MAP_OFFSET, QImage::Format_RGB32);
     QPainter geotiffPainter;
     geotiffPainter.begin(geotiffBackgroundIm_);
 
@@ -125,14 +130,11 @@ namespace pandora_geotiff{
   {
     ROS_INFO("Drawing Checkers...");
     QBrush gridBrush(colorMap[colorD]);
-    bool dark = false;
 
       //draw (checkerboard) grid
     for (int i = 0; i < geotiffBackgroundIm_->width()/CHECKER_SIZE ; i++) {
-      dark = !dark;
       for (int j = 0; j < geotiffBackgroundIm_->height()/CHECKER_SIZE ; j++) {
-        dark = !dark;
-        if (dark) {
+        if ((j+i)%2) {
            geotiffPainter->setPen(colorMap[colorD]);
            gridBrush.setColor(colorMap[colorD]);
            }
@@ -221,7 +223,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
      //Drawing Y
      QPoint pointYText(pointY.x() + CHECKER_SIZE/5, pointY.y() - CHECKER_SIZE/6);
-     QString YString("y");
+     QString YString("Y");
      geotiffPainter->drawText(pointYText, YString);
 
 
@@ -240,17 +242,23 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
     ROS_INFO("A map drawing was requested");
     
-    int xRsize = int(((map.info.height+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE)+500;
-    int yRsize = int(((map.info.width+CHECKER_SIZE)/(CHECKER_SIZE))*CHECKER_SIZE)+500;
-
+    int xRsize = int(((map.info.height)/(CHECKER_SIZE))*CHECKER_SIZE);
+    int yRsize = int(((map.info.width)/(CHECKER_SIZE))*CHECKER_SIZE);
+    
     int xsize = (map.info.height);
     int ysize = (map.info.width);
-
+    //~ ROS_ERROR("XSIZE %d Ysize %d",xsize , ysize);
+    //~ ROS_ERROR("RESOLUTION %f",map.info.resolution);
+    //~ ROS_ERROR("SIZE %d",map.data.size());
     QPainter* mapPainter = new QPainter();
     
     if (not mapInitialized_){
-  
-      geotiffMapIm_ = new QImage(xsize+500,ysize+500, QImage::Format_ARGB32);
+
+      mapXoffset_ = map.info.origin.position.x;
+      mapYoffset_ = map.info.origin.position.y;
+      geotiffMapRes_ = map.info.resolution;
+      CHECKER_SIZE =int( 1/(geotiffMapRes_)) ;
+      geotiffMapIm_ = new QImage(xRsize+CHECKER_SIZE ,yRsize +CHECKER_SIZE , QImage::Format_ARGB32);
       mapInitialized_ = true;
       mapPainter->begin(geotiffMapIm_);
       mapPainter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -274,8 +282,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
            if (grid_space && (xGrid or yGrid)){
              mapPainter->setPen(QPen(colorMap["WHITE_MIN"]));
            }
-          
-          mapPainter->drawPoint(i,ysize-j-1);
+          //i,j MUST BE xsize and J must BE y size if you want to swap y with x u must change a lot of things
+          mapPainter->drawPoint(i,j);
           mapPainter->setPen(Pen);
           
             }
@@ -300,10 +308,18 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
     for(int i = 0; i < points.size()-1; i++){
 
-      pathPainter->drawLine(points[i].x()*50+200,  -points[i].y()*50+200, points[i+1].x()*50+200, -points[i+1].y()*50+200);
-      //~ ROS_INFO("Pathx,%d \t",points[i].x());
-      //~ ROS_INFO("Path,%d \t",points[i].y());
-      //~ std::cout<<"Path "<<points[i].x()<<" ";
+      int a1 = (points[i].x() -mapXoffset_)/geotiffMapRes_;
+      int a2 = (points[i].y() -mapYoffset_)/geotiffMapRes_;
+      int b1 = (points[i+1].x() -mapXoffset_)/geotiffMapRes_;
+      int b2 = (points[i+1].y() -mapYoffset_)/geotiffMapRes_;
+      pathPainter->drawLine(a2 +CHECKER_SIZE/2,a1+CHECKER_SIZE/2,b2 + CHECKER_SIZE/2 ,b1 +CHECKER_SIZE/2);
+
+      if(i<100)
+      {
+      ROS_INFO("Pathx,%lf \t",points[i].x());
+      ROS_INFO("Pathy ,%lf \t",points[i].y());
+
+      }
     }
 
     pathPainter->end();
@@ -321,6 +337,9 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     objectPainter->begin(geotiffMapIm_);
     objectPainter->setPen(colorMap[color]);
     objectPainter->setBrush(colorMap[color]);
+
+    int x = (coords.y() -mapYoffset_)/geotiffMapRes_ +CHECKER_SIZE/2;
+    int y = (coords.x() -mapXoffset_)/geotiffMapRes_ + CHECKER_SIZE/2;
 
     QPen Pen(colorMap[txtcolor]);
     QFont font;
@@ -354,10 +373,10 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     else if (shape =="ARROW")
     {
       QPoint points[4];
-      points[0] = QPoint(coords.x()+3*size,coords.y());
-      points[1] = QPoint(coords.x()-2*size, coords.y() -size);
-      points[2] = QPoint(coords.x()-size, coords.y());
-      points[3] = QPoint(coords.x()-2*size ,coords.y()+size);
+      points[0] = QPoint(x+3*size,y);
+      points[1] = QPoint(x-2*size, y -size);
+      points[2] = QPoint(x-size, y);
+      points[3] = QPoint(x-2*size ,y+size);
       objectPainter->drawPolygon(points, 4);
     }
 
