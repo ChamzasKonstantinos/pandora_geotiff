@@ -779,12 +779,7 @@ break;
    int finalSizeX = (ysize/100)*100 +200;
   
     
-    QTransform transform90DegTmp;
-transform90DegTmp.rotate(-90);
-QTransform transform90Deg = mapIm.trueMatrix(transform90DegTmp, 40, 40);
 
-    
-    mapIm = mapIm.transformed(transform90Deg);
     
 
 QImage geotiff(finalSizeX,finalSizeY, QImage::Format_RGB32);

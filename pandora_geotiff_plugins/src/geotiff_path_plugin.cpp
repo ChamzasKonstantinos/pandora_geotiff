@@ -77,7 +77,7 @@ class PathWriter : public MapWriterPluginInterface
   };
 
 PathWriter::PathWriter()
-    : initialized_(false),gotData(false),PATH_COLOR("MAGENTA"), PATH_WIDTH(4), ARROW_COLOR("YELLOW"), ARROW_SIZE(10)
+    : initialized_(false),gotData(false),PATH_COLOR("MAGENTA"), PATH_WIDTH(4), ARROW_COLOR("YELLOW"), ARROW_SIZE(7)
 {}
 
 PathWriter::~PathWriter()
@@ -127,13 +127,6 @@ void PathWriter::draw(MapWriterInterface *interface)
       const geometry_msgs::PoseStamped& pose (path_vector[i]);
 
       pointVec[i] = Eigen::Vector2f(pose.pose.position.x, pose.pose.position.y);
-      if (i<5)
-      { 
-      ROS_ERROR("PAth frame id %s",robotPath.header.frame_id.c_str());
-      ROS_ERROR("oX%f",pose.pose.position.x);
-      ROS_ERROR("qX%f",pose.pose.orientation.x);
-      ROS_ERROR("qY%f",pose.pose.orientation.y);
-    }
     }
     
     

@@ -58,7 +58,7 @@ namespace pandora_geotiff
           
           for (int i = 0; i<251; i ++ )
             {
-              points[i] = Eigen::Vector2f(i+20,i+50);
+              points[i] = Eigen::Vector2f(i/10,i/10);
             }
           }
         /*Variables*/
@@ -71,13 +71,13 @@ namespace pandora_geotiff
     
     TEST_F(GeotiffCreatorTest, createBackgroundIm)
     {
-      gc.drawMap(map,"YELLOW",-5,5,1);
+      gc.drawMap(map,"SOLID_BLUE",-5,5,1);
       gc.drawMap(map,"MAGENTA",80,110,0);
       gc.drawPath(points,"SOLID_ORANGE",3);
-      //~ gc.drawObjectOfInterest(Eigen::Vector2i(300,300),"BLACK","HELEANA","WHITE","5",20);
-      //~ gc.drawObjectOfInterest(Eigen::Vector2i(250,150),"SOLID_RED","WHITE_MAX","DIAMOND","5",50);
-      //~ gc.drawObjectOfInterest(Eigen::Vector2i(750,50),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",100);
-      //~ gc.drawObjectOfInterest(Eigen::Vector2i(150,550),"YELLOW","WHITE","ARROW","5",10);
+      gc.drawObjectOfInterest(Eigen::Vector2f(0,0),"BLACK","HELEANA","WHITE","5",20);
+      gc.drawObjectOfInterest(Eigen::Vector2f(4,3),"SOLID_RED","WHITE_MAX","DIAMOND","5",50);
+      gc.drawObjectOfInterest(Eigen::Vector2f(10,8),"SOLID_BLUE","WHITE_MAX","CIRCLE","5",100);
+      gc.drawObjectOfInterest(Eigen::Vector2f(0,0),"YELLOW","WHITE","ARROW","5",10);
       gc.createBackgroundIm();
       gc.saveGeotiff();
     }

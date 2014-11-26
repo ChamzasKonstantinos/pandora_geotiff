@@ -118,8 +118,9 @@ namespace pandora_geotiff{
     **/
     void drawMapOrientation(const Eigen::Vector2f& coords,const std::string& color,
       const int& width, QPainter* geotiffPainter);
-  
-  
+
+    Eigen::Vector2i  transformFromMetersToGeotiffPos(const Eigen::Vector2f point);
+    
     std::map<std::string,QColor> colorMap; //!< A Map that corelates all the colors name to string Colors
     
   // I declare these As pointers In case the are moved in another Class :)
@@ -137,6 +138,8 @@ namespace pandora_geotiff{
 
     int mapXoffset_;
     int mapYoffset_;
+    int trimmingXoffset_ ;
+    int trimmingYoffset_ ;
     float  geotiffMapRes_;
     bool mapInitialized_;
     

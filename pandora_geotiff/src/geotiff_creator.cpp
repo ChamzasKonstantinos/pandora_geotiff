@@ -68,8 +68,10 @@ namespace pandora_geotiff{
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
   //this parameters must be set from the map plugin tha will always be called first
     
-    mapXoffset_ = -5;
-    mapYoffset_ = -5;
+    mapXoffset_ = 0;
+    mapYoffset_ = 0;
+    trimmingXoffset_ = 0;
+    trimmingYoffset_ = 0;
     geotiffMapRes_ = 0.02;
     geotiffMapIm_= new QImage(200,200,QImage::Format_ARGB32);
     mapInitialized_ = false;
@@ -98,6 +100,15 @@ namespace pandora_geotiff{
 
     ROS_INFO("Creating BackGroundIm...");
 
+//~ 
+    //~ QTransform transform90DegTmp;
+    //~ transform90DegTmp.rotate(-180);
+    //~ QTransform transform90Deg = geotiffMapIm_->trueMatrix(transform90DegTmp, 40, 40);
+    //~ 
+    //~ *geotiffMapIm_ = geotiffMapIm_->transformed(transform90Deg);
+
+
+    
     geotiffBackgroundIm_= new QImage(geotiffMapIm_->width()+MAP_OFFSET,geotiffMapIm_->height()+MAP_OFFSET, QImage::Format_RGB32);
     QPainter geotiffPainter;
     geotiffPainter.begin(geotiffBackgroundIm_);
@@ -235,30 +246,42 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
      ROS_INFO("MapOrientation drawed succesfully");
    }
+  Eigen::Vector2i  GeotiffCreator::transformFromMetersToGeotiffPos(const Eigen::Vector2f point) 
+ {
+       
+    Eigen::Vector2i tempPoint(point.y()*CHECKER_SIZE-mapYoffset_ ,point.x()*CHECKER_SIZE -mapXoffset_);
 
+    Eigen::Vector2i newPoint(geotiffMapIm_->width() -tempPoint.x() -trimmingXoffset_,geotiffMapIm_->height() -tempPoint.y() -trimmingYoffset_);
+    ROS_ERROR("%d",trimmingXoffset_);
+    ROS_ERROR("%d",trimmingYoffset_);
+    return newPoint;
+ }
   void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,
     const int& bottomThres,const int& topThres, const int& grid_space)
   {
 
     ROS_INFO("A map drawing was requested");
     
-    int xRsize = int(((map.info.height)/(CHECKER_SIZE))*CHECKER_SIZE);
-    int yRsize = int(((map.info.width)/(CHECKER_SIZE))*CHECKER_SIZE);
-    
+    int xRsize = int(((map.info.height)/(CHECKER_SIZE))*CHECKER_SIZE)+ CHECKER_SIZE;
+    int yRsize = int(((map.info.width)/(CHECKER_SIZE))*CHECKER_SIZE) + CHECKER_SIZE;
+
+   
     int xsize = (map.info.height);
     int ysize = (map.info.width);
-    //~ ROS_ERROR("XSIZE %d Ysize %d",xsize , ysize);
-    //~ ROS_ERROR("RESOLUTION %f",map.info.resolution);
-    //~ ROS_ERROR("SIZE %d",map.data.size());
+
+  
+    
     QPainter* mapPainter = new QPainter();
     
     if (not mapInitialized_){
 
-      mapXoffset_ = map.info.origin.position.x;
-      mapYoffset_ = map.info.origin.position.y;
       geotiffMapRes_ = map.info.resolution;
       CHECKER_SIZE =int( 1/(geotiffMapRes_)) ;
-      geotiffMapIm_ = new QImage(xRsize+CHECKER_SIZE ,yRsize +CHECKER_SIZE , QImage::Format_ARGB32);
+      mapXoffset_ = map.info.origin.position.x*CHECKER_SIZE;
+      mapYoffset_ = map.info.origin.position.y*CHECKER_SIZE;
+      trimmingXoffset_ = xRsize - xsize;
+      trimmingYoffset_ = yRsize - ysize;
+      geotiffMapIm_ = new QImage(xRsize ,yRsize , QImage::Format_ARGB32);
       mapInitialized_ = true;
       mapPainter->begin(geotiffMapIm_);
       mapPainter->setCompositionMode(QPainter::CompositionMode_Source);
@@ -275,7 +298,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     mapPainter->setPen(Pen);
     for(int i=0; i<xsize; i++){
       for(int j=0; j<ysize; j++){
-        if((bottomThres < map.data[j + i*ysize])&&(map.data[j + i*ysize] <topThres)){
+        if((bottomThres < map.data[xsize*ysize -j - i*ysize])&&map.data[xsize*ysize -j - i*ysize] <(topThres)){
           bool yGrid = !(j%(CHECKER_SIZE/2));
           bool xGrid = !(i%(CHECKER_SIZE/2));
  
@@ -304,22 +327,15 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     QPen Pen = QPen(colorMap[color]);
     Pen.setWidth(width);
     pathPainter->setPen(Pen);
-
+    Eigen::Vector2i point1;
+    Eigen::Vector2i point2;
 
     for(int i = 0; i < points.size()-1; i++){
 
-      int a1 = (points[i].x() -mapXoffset_)/geotiffMapRes_;
-      int a2 = (points[i].y() -mapYoffset_)/geotiffMapRes_;
-      int b1 = (points[i+1].x() -mapXoffset_)/geotiffMapRes_;
-      int b2 = (points[i+1].y() -mapYoffset_)/geotiffMapRes_;
-      pathPainter->drawLine(a2 +CHECKER_SIZE/2,a1+CHECKER_SIZE/2,b2 + CHECKER_SIZE/2 ,b1 +CHECKER_SIZE/2);
+      point1 = transformFromMetersToGeotiffPos(points[i]);
+      point2 = transformFromMetersToGeotiffPos(points[i+1]);
+      pathPainter->drawLine(point1.x() ,point1.y(),point2.x() ,point2.y());
 
-      if(i<100)
-      {
-      ROS_INFO("Pathx,%lf \t",points[i].x());
-      ROS_INFO("Pathy ,%lf \t",points[i].y());
-
-      }
     }
 
     pathPainter->end();
@@ -328,19 +344,19 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
   }
 
-  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& coords, const std::string& color, const std::string& txtcolor,
+  void GeotiffCreator::drawObjectOfInterest(const Eigen::Vector2f& meterCoords, const std::string& color, const std::string& txtcolor,
      const std::string& shape,const std::string& txt , const int& size)
   {
 
     ROS_INFO("Object of shape %s requested", shape.c_str());
     QPainter* objectPainter = new QPainter();
+
+
     objectPainter->begin(geotiffMapIm_);
-    objectPainter->setPen(colorMap[color]);
     objectPainter->setBrush(colorMap[color]);
+    objectPainter->setPen(colorMap[color]);
 
-    int x = (coords.y() -mapYoffset_)/geotiffMapRes_ +CHECKER_SIZE/2;
-    int y = (coords.x() -mapXoffset_)/geotiffMapRes_ + CHECKER_SIZE/2;
-
+    Eigen::Vector2i pixelCoords = transformFromMetersToGeotiffPos(meterCoords);
     QPen Pen(colorMap[txtcolor]);
     QFont font;
     font.setPixelSize(size/2);
@@ -348,45 +364,48 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     if (shape == "DIAMOND"){
 
       QPoint points[4];
-      points[0] = QPoint(coords.x(), coords.y()+size/2);
-      points[1] = QPoint(coords.x()+size/2, coords.y());
-      points[2] = QPoint(coords.x(), coords.y()-size/2);
-      points[3] = QPoint(coords.x()-size/2, coords.y());
+      points[0] = QPoint(pixelCoords.x(), pixelCoords.y()+size/2);
+      points[1] = QPoint(pixelCoords.x()+size/2, pixelCoords.y());
+      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()-size/2);
+      points[3] = QPoint(pixelCoords.x()-size/2, pixelCoords.y());
+
       objectPainter->drawPolygon(points, 4);
 
       objectPainter->setPen(Pen);
       objectPainter->setFont(font);
-      objectPainter->drawText(coords.x()-size/2,coords.y()-size/2,size,size,
+      objectPainter->drawText(pixelCoords.x()-size/2,pixelCoords.y()-size/2,size,size,
         Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if( shape =="CIRCLE"){
 
-      objectPainter->drawEllipse(QPoint(coords.x(),coords.y()), size/2, size/2);
+      objectPainter->drawEllipse(QPoint(pixelCoords.x(),pixelCoords.y()), size/2, size/2);
 
       objectPainter->setFont(font);
       objectPainter->setPen(Pen);
-      objectPainter->drawText(coords.x()-size/2,coords.y()-size/2,size,size,
+      objectPainter->drawText(pixelCoords.x()-size/2,pixelCoords.y()-size/2,size,size,
         Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if (shape =="ARROW")
     {
       QPoint points[4];
-      points[0] = QPoint(x+3*size,y);
-      points[1] = QPoint(x-2*size, y -size);
-      points[2] = QPoint(x-size, y);
-      points[3] = QPoint(x-2*size ,y+size);
+      points[0] = QPoint(pixelCoords.x(),pixelCoords.y()-3*size);
+      points[1] = QPoint(pixelCoords.x()+size, pixelCoords.y() +2*size);
+      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()+size);
+      points[3] = QPoint(pixelCoords.x()-size ,pixelCoords.y()+2*size);
       objectPainter->drawPolygon(points, 4);
     }
 
     else
     {
 
-      ROS_INFO("THIS SHAPE is not supported");
+      ROS_WARN("THIS SHAPE is not supported");
     }
 
     objectPainter->end();
+
+  
     ROS_INFO("drawing Object of shape %s  completed", shape.c_str());
   }
 }//namespace pandora_geotiff
