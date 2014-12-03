@@ -1,9 +1,9 @@
-#include <map_writer_interface.h>
+#include <map_creator_interface.h>
 #include <map_writer_plugin_interface.h>
 #include <pandora_data_fusion_msgs/DatafusionGeotiffSrv.h>
 #include <boost/lexical_cast.hpp>
 #include <ros/ros.h>
-
+#include <tf/transform_listener.h>
 #include <pluginlib/class_loader.h>
 
 std::string homeFolderString("/home/konstantinos");
@@ -31,16 +31,20 @@ protected:
   ros::ServiceClient service_client_;
 
   bool initialized_;
+  bool gotData_;
   std::string name_;
   bool draw_all_objects_;
   std::string class_id_;
   std::string QRS_COLOR;
   std::string VICTIMS_COLOR;
+  std::string TXT_COLOR;
   std::string HAZMATS_COLOR;
-  //~ std::string HAZMATS_SHAPE;
-  //~ std::string QRS_SHAPE
-  //~ std::string VICTIMS_SHAPE
-  //~ 
+  std::string HAZMATS_SHAPE;
+  std::string QRS_SHAPE;
+  std::string VICTIMS_SHAPE;
+  int HAZMATS_SIZE;
+  int QRS_SIZE;
+  int VICTIMS_SIZE;
   
 private:
 
@@ -51,7 +55,9 @@ private:
 };
 
 ObjectsWriter::ObjectsWriter()
-    : initialized_(false),gotData(false),VICTIMS_COLOR("BLACK"),HAZMATS_COLOR("MAGENTA"),QRS_COLOR("RED")
+    : initialized_(false),gotData_(false),VICTIMS_COLOR("SOLID_RED"),HAZMATS_COLOR("SOLID_ORANGE"),QRS_COLOR("SOLID_BLUE"),
+        VICTIMS_SHAPE("CIRCLE"),HAZMATS_SHAPE("DIAMOND"),QRS_SHAPE("CIRCLE"),TXT_COLOR("WHITE_MAX"),
+        VICTIMS_SIZE(35),HAZMATS_SIZE(42),QRS_SIZE(35)
 {}
 
 ObjectsWriter::~ObjectsWriter()
@@ -117,34 +123,6 @@ void ObjectsWriter::generateQrCsv(std::string missionName){
   filepath.append(filenameString);
 }
 
-  //~ std::cout << filepath << "\n";
-  //~ 
-  //~ std::ofstream csvFile;
-  //~ csvFile.open(filepath.c_str());
-  //~ 
-  //~ // ---csvFile---
-  //~ // Resko Koblenz, Germany
-  //~ // 2013-06-23; 14:37:03
-  //~ // Semi1
-  //~ //
-  //~ // 1;14:28:01;Y_1_1_chair_yoked;-8.29994;-2.29014
-  //~ 
-  //~ csvFile << "PANDORA AUTh, Greece" << std::endl;
-  //~ csvFile << getDateAndTime() << std::endl;
-  //~ csvFile << missionName.toUtf8().constData() << std::endl << std::endl;
-  //~ std::string qrWorldTime[qrSize];
-  //~ 
-  //~ for(int i=0; i<qrSize; i++){
-    //~ qrWorldTime[i] = getQrTime(qrTime[i]);
-    //~ }
-  //~ 
-  //~ for(int i=0; i<qrSize; i++){
-    //~ csvFile << i+1 << ";" << qrWorldTime[i] << ";" << qrType[i] << ";" << qrWorldX[i] << ";" << qrWorldY[i] << std::endl;
-  //~ }
-  //~ csvFile.close();
-//~ 
-//~ }
-
 void ObjectsWriter::getObjectsData()
 {
     pandora_data_fusion_msgs::DatafusionGeotiffSrv dataFusionSrv;
@@ -158,47 +136,71 @@ void ObjectsWriter::getObjectsData()
     ROS_INFO("VICTIMS_SAVED SUCCESEFULLY");
     qrs_ = dataFusionSrv.response.qrs;
     ROS_INFO("QRS_SAVED SUCCESEFULLY");
-    hamzats_ = dataFusionSrv.response.hazmats; 
+    hazmats_ = dataFusionSrv.response.hazmats; 
     ROS_INFO("HAZMATS_SAVED SUCCESFULLY");
+    gotData_ = true;
+  }
 
 
 void ObjectsWriter::draw(MapWriterInterface *interface)
 {
     this->getObjectsData();
 
-    if(!initialized_||!gotData)
+    if(!initialized_||!gotData_)
     {
       ROS_WARN_NAMED("OBjectsWriter","ObjectWriter plugin not initilized or no data has been received /n ABORTING DRAWING..");
       return;
 
-    
+  }
     ROS_INFO("DRAWING THE AWESOME OBJECTS");
     
     Eigen::Vector2f coords;
-    std:string txt;
-    
-    for (int i = 0 ; i< qrs_->size(); i++)
-    {
-     coords = Eigen::Vector2f((*qrs_[i].pose.position.x,*qrs_[i].pose.position.y);
-     txt = boost::lexical_cast<std::string>(i+1);
+    std::string txt;
+
+    tf::TransformListener listener;
+    tf::StampedTransform transform;
+    tfScalar pitch, roll, yaw;
      
-     interface->drawObjectOfInterest(coords,QRSCOLOR ,TXTCOLOR, SHAPE,txt,QRSIZE);
+    try{
+
+      listener.waitForTransform("/map", "/data", ros::Time(), ros::Duration(1));
+      listener.lookupTransform("/map", "/data", ros::Time(), transform);
+    }
+    catch (tf::TransformException &ex) {
+      ROS_ERROR("%s",ex.what());
+      ros::Duration(1.0).sleep();
+    }
+    transform.getBasis().getRPY(roll, pitch, yaw);
+    tf::Vector3 origin = transform.getOrigin();
+    for (int i = 0 ; i< qrs_.size(); i++)
+    {
+      float x  =  qrs_[i].pose.position.x + origin.x();
+      float y  = qrs_[i].pose.position.y + origin.y();
+      coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
+      txt = boost::lexical_cast<std::string>(i+1);
+     
+     interface->drawObjectOfInterest(coords,QRS_COLOR ,TXT_COLOR, QRS_SHAPE,txt,QRS_SIZE);
     }
 
-    for (int i = 0 ; i< victims_->size(); i++)
+    for (int i = 0 ; i< victims_.size(); i++)
     {
-     coords = Eigen::Vector2f((*victims_[i].pose.position.x,*victims_[i].pose.position.y);
-     txt = boost::lexical_cast<std::string>(i+1);
+      float x  = victims_[i].pose.position.x + origin.x();
+      float y  = victims_[i].pose.position.y + origin.y();
+      coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
+      txt = boost::lexical_cast<std::string>(i+1);
      
-     interface->drawObjectOfInterest(coords,VICTIMSCOLOR ,TXTCOLOR, SHAPE,txt,VICTIMSIZE);
+     interface->drawObjectOfInterest(coords,VICTIMS_COLOR ,TXT_COLOR, VICTIMS_SHAPE,txt,VICTIMS_SIZE);
     }
     
-    for (int i = 0 ; i< hamzats_->size(); i++)
+    for (int i = 0 ; i< hazmats_.size(); i++)
     {
-     coords = Eigen::Vector2f((*hamzats_[i].pose.position.x,*hamzats_[i].pose.position.y);
+      
+      float x  = hazmats_[i].pose.position.x + origin.x();
+      float y  = hazmats_[i].pose.position.y + origin.y();
+      coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
      txt = boost::lexical_cast<std::string>(i+1);
      
-     interface->drawObjectOfInterest(coords,HAZMATS_COLOR ,TXT_COLOR, SHAPE,txt,HAZMATS_SIZE);
+     interface->drawObjectOfInterest(coords,HAZMATS_COLOR ,TXT_COLOR, HAZMATS_SHAPE,txt,HAZMATS_SIZE);
     }
 
     ROS_INFO("DRAWING THE AWESOME OBJECTS SUCCEEDED");

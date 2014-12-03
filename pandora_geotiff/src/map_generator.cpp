@@ -1,6 +1,5 @@
 # include "map_generator.h"
 
-
 MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator), plugin_loader_(0) ,pn_("~")
   {
     pn_.param("plugins", p_plugin_list_, std::string(""));

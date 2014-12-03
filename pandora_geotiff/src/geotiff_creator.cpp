@@ -90,7 +90,7 @@ namespace pandora_geotiff{
     colorMap["SOLID_RED"]       = QColor(240, 10, 10);
     colorMap["YELLOW"]          = QColor(255, 200, 0);
     colorMap["SOLID_ORANGE"]    = QColor(255, 100, 30);
-    colorMap["SOLID BLUE"]      = QColor(10, 10, 240);
+    colorMap["SOLID_BLUE"]      = QColor(10, 10, 240);
     colorMap["MAGENTA"]         = QColor(120, 0, 140);
 
   }
@@ -99,15 +99,6 @@ namespace pandora_geotiff{
   {
 
     ROS_INFO("Creating BackGroundIm...");
-
-//~ 
-    //~ QTransform transform90DegTmp;
-    //~ transform90DegTmp.rotate(-180);
-    //~ QTransform transform90Deg = geotiffMapIm_->trueMatrix(transform90DegTmp, 40, 40);
-    //~ 
-    //~ *geotiffMapIm_ = geotiffMapIm_->transformed(transform90Deg);
-
-
     
     geotiffBackgroundIm_= new QImage(geotiffMapIm_->width()+MAP_OFFSET,geotiffMapIm_->height()+MAP_OFFSET, QImage::Format_RGB32);
     QPainter geotiffPainter;
@@ -252,8 +243,6 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     Eigen::Vector2i tempPoint(point.y()*CHECKER_SIZE-mapYoffset_ ,point.x()*CHECKER_SIZE -mapXoffset_);
 
     Eigen::Vector2i newPoint(geotiffMapIm_->width() -tempPoint.x() -trimmingXoffset_,geotiffMapIm_->height() -tempPoint.y() -trimmingYoffset_);
-    ROS_ERROR("%d",trimmingXoffset_);
-    ROS_ERROR("%d",trimmingYoffset_);
     return newPoint;
  }
   void GeotiffCreator::drawMap(const nav_msgs::OccupancyGrid& map,const std::string& color,
@@ -323,9 +312,9 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     ROS_INFO("A path drawing was requested");
     QPainter* pathPainter= new QPainter();
     pathPainter->begin(geotiffMapIm_);
-
+    int rWidth = width*(CHECKER_SIZE/100);
     QPen Pen = QPen(colorMap[color]);
-    Pen.setWidth(width);
+    Pen.setWidth(rWidth);
     pathPainter->setPen(Pen);
     Eigen::Vector2i point1;
     Eigen::Vector2i point2;
@@ -350,8 +339,8 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
 
     ROS_INFO("Object of shape %s requested", shape.c_str());
     QPainter* objectPainter = new QPainter();
-
-
+    int rSize = size/(geotiffMapRes_*100);
+    ROS_ERROR("%d ,%d",rSize ,size);
     objectPainter->begin(geotiffMapIm_);
     objectPainter->setBrush(colorMap[color]);
     objectPainter->setPen(colorMap[color]);
@@ -359,41 +348,41 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     Eigen::Vector2i pixelCoords = transformFromMetersToGeotiffPos(meterCoords);
     QPen Pen(colorMap[txtcolor]);
     QFont font;
-    font.setPixelSize(size/2);
-
+    font.setPixelSize(rSize/2);
+    
     if (shape == "DIAMOND"){
 
       QPoint points[4];
-      points[0] = QPoint(pixelCoords.x(), pixelCoords.y()+size/2);
-      points[1] = QPoint(pixelCoords.x()+size/2, pixelCoords.y());
-      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()-size/2);
-      points[3] = QPoint(pixelCoords.x()-size/2, pixelCoords.y());
+      points[0] = QPoint(pixelCoords.x(), pixelCoords.y()+rSize/2 );
+      points[1] = QPoint(pixelCoords.x()+rSize/2, pixelCoords.y());
+      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()-rSize/2 );
+      points[3] = QPoint(pixelCoords.x()-rSize/2, pixelCoords.y());
 
       objectPainter->drawPolygon(points, 4);
 
       objectPainter->setPen(Pen);
       objectPainter->setFont(font);
-      objectPainter->drawText(pixelCoords.x()-size/2,pixelCoords.y()-size/2,size,size,
+      objectPainter->drawText(pixelCoords.x()-rSize/2,pixelCoords.y()-rSize/2 ,rSize,rSize,
         Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if( shape =="CIRCLE"){
 
-      objectPainter->drawEllipse(QPoint(pixelCoords.x(),pixelCoords.y()), size/2, size/2);
+      objectPainter->drawEllipse(QPoint(pixelCoords.x(),pixelCoords.y()), rSize/2, rSize/2);
 
       objectPainter->setFont(font);
       objectPainter->setPen(Pen);
-      objectPainter->drawText(pixelCoords.x()-size/2,pixelCoords.y()-size/2,size,size,
+      objectPainter->drawText(pixelCoords.x()-rSize/2,pixelCoords.y()-rSize/2,rSize,rSize,
         Qt::AlignCenter,QString::fromStdString(txt));
     }
 
     else if (shape =="ARROW")
     {
       QPoint points[4];
-      points[0] = QPoint(pixelCoords.x(),pixelCoords.y()-3*size);
-      points[1] = QPoint(pixelCoords.x()+size, pixelCoords.y() +2*size);
-      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()+size);
-      points[3] = QPoint(pixelCoords.x()-size ,pixelCoords.y()+2*size);
+      points[0] = QPoint(pixelCoords.x(),pixelCoords.y()-3*rSize);
+      points[1] = QPoint(pixelCoords.x()+rSize, pixelCoords.y() +2*rSize);
+      points[2] = QPoint(pixelCoords.x(), pixelCoords.y()+rSize);
+      points[3] = QPoint(pixelCoords.x()-rSize ,pixelCoords.y()+2*rSize);
       objectPainter->drawPolygon(points, 4);
     }
 

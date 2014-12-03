@@ -53,12 +53,12 @@ using namespace pandora_geotiff;
     std::string map_topic_name_;
   
     plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/map"));
-    plugin_nh.param("MAP_BOT_THRES",MAP_BOT_THRES,0);
-    plugin_nh.param("MAP_TOP_THRES",MAP_TOP_THRES,30);
-    plugin_nh.param("MAP_COLOR",MAP_COLOR, std::string("WHITE_MAX"));
-    plugin_nh.param("WALL_BOT_THRES",WALL_BOT_THRES,60);
-    plugin_nh.param("WALL_TOP_THRES",WALL_TOP_THRES,250);
-    plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("SOLID BLUE"));
+    plugin_nh.param("/pandora_geotiff_node/MAP_BOT_THRES",MAP_BOT_THRES,0);
+    plugin_nh.param("/pandora_geotiff_node/MAP_TOP_THRES",MAP_TOP_THRES,60);
+    plugin_nh.param("/pandora_geotiff_node/MAP_COLOR",MAP_COLOR, std::string("WHITE_MAX"));
+    plugin_nh.param("/pandora_geotiff_node/WALL_BOT_THRES",WALL_BOT_THRES,50);
+    plugin_nh.param("/pandora_geotiff_node/WALL_TOP_THRES",WALL_TOP_THRES,250);
+    plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("SOLID_BLUE"));
       
     map_sub = plugin_nh.subscribe(map_topic_name_,
          1000,  &MapWriter::getGeotiffDataMap,this);
@@ -71,15 +71,6 @@ using namespace pandora_geotiff;
   void MapWriter::getGeotiffDataMap(nav_msgs::OccupancyGrid map)
   {
     this->map = map;
-    //~ ROS_ERROR("oX%f",map.info.origin.position.x);
-    //~ ROS_ERROR("oY%f",map.info.origin.position.y);
-    //~ ROS_ERROR("oZ%f",map.info.origin.position.z);
-    //~ ROS_ERROR("qX%f",map.info.origin.orientation.x);
-    //~ ROS_ERROR("qY%f",map.info.origin.orientation.y);
-    //~ ROS_ERROR("qZ%f",map.info.origin.orientation.z);
-    //~ ROS_ERROR("qW%f",map.info.origin.orientation.w);
-    //~ ROS_ERROR("frame id %s",map.header.frame_id.c_str());
-    
     gotData = true;
   }
 

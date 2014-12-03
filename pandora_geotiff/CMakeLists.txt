@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_geotiff)
-find_package(catkin REQUIRED COMPONENTS cmake_modules pluginlib roscpp std_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS cmake_modules pluginlib roscpp std_msgs message_generation tf)
 
 find_package(Qt4 4.6 COMPONENTS QtCore QtGui  REQUIRED)
 
@@ -27,6 +27,7 @@ catkin_package(
   CATKIN_DEPENDS  pluginlib roscpp std_msgs
   LIBRARIES
   DEPENDS Eigen QT
+  tf
 )
 
 
@@ -49,17 +50,17 @@ add_dependencies(geotiff_creator  ${catkin_EXPORTED_TARGETS})
 
 add_library( map_generator src/map_generator.cpp)
 target_link_libraries(map_generator  geotiff_creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies( map_generator   geotiff_creator${catkin_EXPORTED_TARGETS})
+add_dependencies( map_generator   geotiff_creator ${catkin_EXPORTED_TARGETS})
 
 add_executable(pandora_geotiff_node src/pandora_geotiff_node.cpp)
 target_link_libraries(pandora_geotiff_node   
       ${catkin_LIBRARIES}
       map_generator
       )
-#~ 
-#~ add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
-#~ target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
-#~ 
+
+add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
+target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
+
 
 
 if(CATKIN_ENABLE_TESTING)
