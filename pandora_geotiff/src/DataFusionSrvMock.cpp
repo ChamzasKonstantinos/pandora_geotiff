@@ -2,11 +2,9 @@
 #include <pandora_data_fusion_msgs/DatafusionGeotiffSrv.h>
 #include <tf/transform_broadcaster.h>
 
-
 bool data_fusion_geotiff(pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request &req,
     pandora_data_fusion_msgs::DatafusionGeotiffSrv::Response &res)
 {
-
 
      geometry_msgs::PoseStamped victim1;
      geometry_msgs::PoseStamped hazmat1;
@@ -22,6 +20,8 @@ bool data_fusion_geotiff(pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request
      
      victim1.pose.position.x = 14;
      victim1.pose.position.y = -0.76;
+     victim1.header.frame_id = "data";
+     victim1.header.stamp = ros::Time(0);
 
      victim2.pose.position.x = 16.24;
      victim2.pose.position.y = -1.68;
@@ -31,7 +31,9 @@ bool data_fusion_geotiff(pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request
 
      hazmat1.pose.position.x = 0.65;
      hazmat1.pose.position.y = -1.54;
-
+     hazmat1.header.frame_id = "data";;
+     hazmat1.header.stamp = ros::Time(0);
+     
      hazmat2.pose.position.x = 8.335711;
      hazmat2.pose.position.y = 0.2478;
 
@@ -41,6 +43,8 @@ bool data_fusion_geotiff(pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request
      qr1.pose.position.x = 4.338;
      qr1.pose.position.y = 6.22851;
 
+     qr1.header.frame_id = "data";;
+     qr1.header.stamp = ros::Time(0);
 
      qr2.pose.position.x = 3.17607;
      qr2.pose.position.y = 6.92356;
@@ -52,13 +56,14 @@ bool data_fusion_geotiff(pandora_data_fusion_msgs::DatafusionGeotiffSrv::Request
      res.victims.push_back(victim1);
      res.victims.push_back(victim2);
      res.victims.push_back(victim3);
+
      res.hazmats.push_back(hazmat1);
      res.hazmats.push_back(hazmat2);
      res.hazmats.push_back(hazmat3);
      res.qrs.push_back(qr1);
      res.qrs.push_back(qr2);
      res.qrs.push_back(qr3);
-     
+    
      ROS_INFO("Mock DataFusion was requested succesfully");
      return true;
    

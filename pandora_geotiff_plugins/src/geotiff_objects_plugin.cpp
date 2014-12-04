@@ -163,8 +163,8 @@ void ObjectsWriter::draw(MapWriterInterface *interface)
      
     try{
 
-      listener.waitForTransform("/map", "/data", ros::Time(), ros::Duration(1));
-      listener.lookupTransform("/map", "/data", ros::Time(), transform);
+      listener.waitForTransform("/map", victims_[0].header.frame_id ,victims_[0].header.stamp, ros::Duration(1));
+      listener.lookupTransform("/map", victims_[0].header.frame_id , victims_[0].header.stamp, transform);
     }
     catch (tf::TransformException &ex) {
       ROS_ERROR("%s",ex.what());
