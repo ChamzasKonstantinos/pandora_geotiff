@@ -339,7 +339,6 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
     ROS_INFO("Object of shape %s requested", shape.c_str());
     QPainter* objectPainter = new QPainter();
     int rSize = size/(geotiffMapRes_*100);
-    ROS_ERROR("%d ,%d",rSize ,size);
     objectPainter->begin(geotiffMapIm_);
     objectPainter->setBrush(colorMap[color]);
     objectPainter->setPen(colorMap[color]);

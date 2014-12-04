@@ -53,12 +53,12 @@ using namespace pandora_geotiff;
     std::string map_topic_name_;
   
     plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/map"));
-    plugin_nh.param("/pandora_geotiff_node/MAP_BOT_THRES",MAP_BOT_THRES,0);
-    plugin_nh.param("/pandora_geotiff_node/MAP_TOP_THRES",MAP_TOP_THRES,0);
-    plugin_nh.param("/pandora_geotiff_node/MAP_COLOR",MAP_COLOR, std::string("WHITE_MAX"));
-    plugin_nh.param("/pandora_geotiff_node/WALL_BOT_THRES",WALL_BOT_THRES,0);
-    plugin_nh.param("/pandora_geotiff_node/WALL_TOP_THRES",WALL_TOP_THRES,0);
-    plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("SOLID_BLUE"));
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_bot_thres",MAP_BOT_THRES,0);
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_top_thres",MAP_TOP_THRES,50);
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_color",MAP_COLOR, std::string("WHITE_MAX"));
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_bot_thres",WALL_BOT_THRES,52);
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_top_thres",WALL_TOP_THRES,255);
+    plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_color",WALL_COLOR, std::string("SOLID_BLUE"));
       
     map_sub = plugin_nh.subscribe(map_topic_name_,
          1000,  &MapWriter::getGeotiffDataMap,this);

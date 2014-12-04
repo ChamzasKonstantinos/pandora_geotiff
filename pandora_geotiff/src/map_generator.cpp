@@ -39,13 +39,13 @@ MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator
     }
   }
 
-  void MapGenerator::writeGeotiff()
+  void MapGenerator::writeGeotiff(const std::string& missionName)
   {
     
     for (size_t i = 0; i < plugin_vector_.size(); ++i){
       plugin_vector_[i]->draw(geotiffCreator);
     }
-    
+    ROS_ERROR("%s",missionName.c_str());
     geotiffCreator->createBackgroundIm();   
     geotiffCreator->saveGeotiff();
 }
@@ -55,6 +55,6 @@ MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator
   {
     ROS_INFO("SaveMission service was requested");
     
-    this->writeGeotiff();
+    this->writeGeotiff(std::string(req.SaveMisionFileName.data));
     return true;
   }

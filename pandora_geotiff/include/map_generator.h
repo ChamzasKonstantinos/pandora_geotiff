@@ -33,7 +33,7 @@ class MapGenerator
     MapGenerator();
     ~MapGenerator();
   
-    void writeGeotiff();
+    void writeGeotiff(const std::string& missionName);
     bool saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
       pandora_geotiff::SaveMission::Response& res );
 };
