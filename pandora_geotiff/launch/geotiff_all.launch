@@ -8,35 +8,15 @@
   <node pkg="pandora_geotiff" type="pandora_geotiff_node" name="pandora_geotiff_node" output="screen" >
     
     
-     <param name="plugins" type="string"
+  <param name="plugins" type="string"
        value="pandora_geotiff_plugins/MapWriter pandora_geotiff_plugins/CoverageWriter pandora_geotiff_plugins/PathWriter pandora_geotiff_plugins/ObjectsWriter"/>
 
-    Alert Handler  
-<!--
-  <node type="alert_handler_node" name="alert_handler" 
-    pkg="pandora_alert_handler" respawn="false" output="screen" ns="data_fusion" /> 
-  <rosparam file="$(find pandora_alert_handler)/config/alert_handler/alert_handler_params.yaml"
-    command="load" ns="data_fusion/alert_handler" />
--->
-    <param name = "/published_topic_names/coverage_map" type = "string" value = "/data_fusion/sensor_coverage/coverage_map"/>
-    <param name ="/published_topic_names/map" type = "string" value ="/slam/occupancyGridMap"/>
-    
-    <param name ="COVERAGE_COLOR" type ="string" value ="LIGHT_GREEN_MAX"/>
-    <param name ="WALL_COLOR" type = "string"  value = "SOLID BLUE"/>
-    <param name ="MAP_COLOR" type = "string" value ="WHITE_MAX"/>
+  <rosparam file="$(find pandora_geotiff_plugins)/config/geotiff_plugins/geotiff_plugins_params.yaml"
+    command="load"  />
 
-
-    <param name ="COV_BOT_THRES" type = "int" value = "-5" />
-    <param name ="COV_TOP_THRES" type = "int" value = "100" />
     
-    <param name ="MAP_BOT_THRES" type = "int" value = "0" />
-    <param name ="MAP_TOP_THRES" type = "int" value = "50"/>
-    
-    <param name ="WALL_BOT_THRES" type = "int" value = "52 "/>
-    <param name ="WALL_TOP_THRES" type = "int" value = "255 "/>
-    
-      
-    
+  <rosparam file="$(find pandora_geotiff)/config/geotiff_creator/geotiff_creator_params.yaml"
+    command="load"  />
   </node>
 
    <node pkg="pandora_geotiff" type="DataFusionSrvMock" name="DataFusionSrvMock" output="screen" >

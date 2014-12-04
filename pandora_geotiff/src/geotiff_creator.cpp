@@ -42,7 +42,6 @@ namespace pandora_geotiff{
 
   GeotiffCreator::GeotiffCreator()
   {
-
     fake_argc_ = 0;
     //Create a QApplication cause otherwise drawing text will crash
     app_ = new QApplication(fake_argc_, fake_argv_, false);

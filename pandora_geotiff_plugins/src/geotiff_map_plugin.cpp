@@ -54,10 +54,10 @@ using namespace pandora_geotiff;
   
     plugin_nh.param("/published_topic_names/map", map_topic_name_, std::string("/slam/map"));
     plugin_nh.param("/pandora_geotiff_node/MAP_BOT_THRES",MAP_BOT_THRES,0);
-    plugin_nh.param("/pandora_geotiff_node/MAP_TOP_THRES",MAP_TOP_THRES,60);
+    plugin_nh.param("/pandora_geotiff_node/MAP_TOP_THRES",MAP_TOP_THRES,0);
     plugin_nh.param("/pandora_geotiff_node/MAP_COLOR",MAP_COLOR, std::string("WHITE_MAX"));
-    plugin_nh.param("/pandora_geotiff_node/WALL_BOT_THRES",WALL_BOT_THRES,50);
-    plugin_nh.param("/pandora_geotiff_node/WALL_TOP_THRES",WALL_TOP_THRES,250);
+    plugin_nh.param("/pandora_geotiff_node/WALL_BOT_THRES",WALL_BOT_THRES,0);
+    plugin_nh.param("/pandora_geotiff_node/WALL_TOP_THRES",WALL_TOP_THRES,0);
     plugin_nh.param("WALL_COLOR",WALL_COLOR, std::string("SOLID_BLUE"));
       
     map_sub = plugin_nh.subscribe(map_topic_name_,
