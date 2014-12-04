@@ -19,3 +19,9 @@
 *.exe
 *.out
 *.app
+
+#Custom
+hector_geotiff
+hector_geotiff_plugins
+GeotiffCreator(OLD).cpp
+GeotiffCreator(OLD).h
