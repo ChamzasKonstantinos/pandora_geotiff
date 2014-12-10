@@ -1,22 +1,28 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_geotiff_plugins)
-find_package(catkin REQUIRED COMPONENTS pandora_geotiff pandora_data_fusion_msgs)
+
+find_package(catkin REQUIRED COMPONENTS
+  pluginlib
+  nav_msgs
+  tf
+  pandora_geotiff
+  pandora_data_fusion_msgs
+)
 
 
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES pandora_geotiff_plugins
-#  CATKIN_DEPENDS pandora_geotiff pandora_nav_msgs
-#  DEPENDS
+#INCLUDE_DIRS
+LIBRARIES
+  pandora_geotiff_plugins
+CATKIN_DEPENDS
+  pluginlib
+  nav_msgs
+  tf
+  pandora_geotiff
+  pandora_data_fusion_msgs
+#DEPENDS
 )
 
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-# include_directories(include)
 include_directories(
   ${catkin_INCLUDE_DIRS}
 )
@@ -29,22 +35,8 @@ add_library(pandora_geotiff_plugins
   src/geotiff_objects_plugin.cpp
 )
 add_dependencies(pandora_geotiff_plugins   ${catkin_EXPORTED_TARGETS})
-## Specify libraries to link a library or executable target against
 target_link_libraries(pandora_geotiff_plugins 
   ${catkin_LIBRARIES}
-)
-
-#############
-## Install ##
-#############
-
-# all install targets should use catkin DESTINATION variables
-# See http://ros.org/doc/api/catkin/html/adv_user_guide/variables.html
-
-install(TARGETS pandora_geotiff_plugins
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 

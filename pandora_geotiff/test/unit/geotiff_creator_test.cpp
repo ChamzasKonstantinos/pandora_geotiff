@@ -36,7 +36,7 @@
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
 #include "gtest/gtest.h"
-#include "geotiff_creator.h"
+#include "pandora_geotiff/geotiff_creator.h"
 #include "map_loader/map_loader.h"
 #include <ros/package.h>
 namespace pandora_geotiff

@@ -1,4 +1,4 @@
-#include "map_generator.h"
+#include "pandora_geotiff/map_generator.h"
 
 
 int main(int argc, char **argv){

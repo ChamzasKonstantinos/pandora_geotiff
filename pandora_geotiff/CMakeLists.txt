@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(pandora_geotiff)
-find_package(catkin REQUIRED COMPONENTS cmake_modules pluginlib roscpp std_msgs message_generation tf)
+find_package(catkin REQUIRED COMPONENTS 
+  cmake_modules
+  pluginlib
+  roscpp
+  std_msgs
+  message_generation
+  tf
+  pandora_data_fusion_msgs
+)
 
 find_package(Qt4 4.6 COMPONENTS QtCore QtGui  REQUIRED)
 
@@ -10,13 +18,11 @@ add_definitions(${Eigen_DEFINITIONS})
 
 include(${QT_USE_FILE})
 
-
-
 add_service_files(
    FILES
    SaveMission.srv
  )
- 
+
 generate_messages(
   DEPENDENCIES
   std_msgs
@@ -27,19 +33,10 @@ catkin_package(
   CATKIN_DEPENDS  pluginlib roscpp std_msgs
   LIBRARIES
   DEPENDS Eigen QT
-  tf
 )
 
-
-
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(include include/pandora_geotiff)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -53,14 +50,14 @@ target_link_libraries(map_generator  geotiff_creator ${catkin_LIBRARIES} ${QT_LI
 add_dependencies( map_generator   geotiff_creator ${catkin_EXPORTED_TARGETS})
 
 add_executable(pandora_geotiff_node src/pandora_geotiff_node.cpp)
-target_link_libraries(pandora_geotiff_node   
+target_link_libraries(pandora_geotiff_node
       ${catkin_LIBRARIES}
       map_generator
+      geotiff_creator
       )
 
-add_executable(DataFusionSrvMock src/DataFusionSrvMock.cpp)
-target_link_libraries(DataFusionSrvMock ${catkin_LIBRARIES})
-
+add_executable(data_fusion_mock test/data_fusion_mock_srv.cpp)
+target_link_libraries(data_fusion_mock ${catkin_LIBRARIES})
 
 
 if(CATKIN_ENABLE_TESTING)

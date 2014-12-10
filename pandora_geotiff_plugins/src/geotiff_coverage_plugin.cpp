@@ -1,5 +1,5 @@
-#include <map_creator_interface.h>
-#include <map_writer_plugin_interface.h>
+#include <pandora_geotiff/map_creator_interface.h>
+#include <pandora_geotiff/map_writer_plugin_interface.h>
 #include <nav_msgs/OccupancyGrid.h>
 #include <ros/ros.h>
 #include <pluginlib/class_loader.h>

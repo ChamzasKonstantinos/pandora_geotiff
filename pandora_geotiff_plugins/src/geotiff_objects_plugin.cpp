@@ -1,6 +1,6 @@
-#include <map_creator_interface.h>
-#include <map_writer_plugin_interface.h>
-#include <pandora_data_fusion_msgs/DatafusionGeotiffSrv.h>
+#include <pandora_geotiff/map_creator_interface.h>
+#include <pandora_geotiff/map_writer_plugin_interface.h>
+#include <pandora_data_fusion_msgs/GeotiffSrv.h>
 #include <boost/lexical_cast.hpp>
 #include <ros/ros.h>
 #include <tf/transform_listener.h>
@@ -70,7 +70,7 @@ void ObjectsWriter::initialize(const std::string& name)
 
   plugin_nh.param("service_name", service_name_, std::string("data_fusion_geotiff"));
 
-  service_client_ = nh_.serviceClient<pandora_data_fusion_msgs::DatafusionGeotiffSrv>(service_name_);
+  service_client_ = nh_.serviceClient<pandora_data_fusion_msgs::GeotiffSrv>(service_name_);
 
   initialized_ = true;
   this->name_ = name;
@@ -125,7 +125,7 @@ void ObjectsWriter::generateQrCsv(std::string missionName){
 
 void ObjectsWriter::getObjectsData()
 {
-    pandora_data_fusion_msgs::DatafusionGeotiffSrv dataFusionSrv;
+    pandora_data_fusion_msgs::GeotiffSrv dataFusionSrv;
 
     if (!service_client_.call(dataFusionSrv)) {
       ROS_ERROR_NAMED(name_, "Cannot draw Objects, service %s failed", service_client_.getService().c_str());

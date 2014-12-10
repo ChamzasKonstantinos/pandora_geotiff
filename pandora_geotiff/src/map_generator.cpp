@@ -1,4 +1,4 @@
-# include "map_generator.h"
+#include "pandora_geotiff/map_generator.h"
 
 MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator), plugin_loader_(0) ,pn_("~")
   {

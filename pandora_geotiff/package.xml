@@ -30,4 +30,6 @@
   <run_depend>std_msgs</run_depend>
   <run_depend>libqt4-dev</run_depend>
   <run_depend>tf</run_depend>
+
+  <build_depend>pandora_data_fusion_msgs</build_depend>
 </package>

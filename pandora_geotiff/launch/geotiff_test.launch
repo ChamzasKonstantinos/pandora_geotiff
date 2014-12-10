@@ -19,7 +19,7 @@
     command="load"  />
   </node>
 
-   <node pkg="pandora_geotiff" type="DataFusionSrvMock" name="DataFusionSrvMock" output="screen" >
+   <node pkg="pandora_geotiff" type="data_fusion_mock" name="DataFusionSrvMock" output="screen" >
 
   </node>
   <node pkg="tf" type="static_transform_publisher" name="map_broadcaster" args="1 -1 0 1.59 0 0 map data2 100" />

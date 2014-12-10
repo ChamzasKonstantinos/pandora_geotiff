@@ -35,8 +35,8 @@
  * Authors:
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
-#include <map_creator_interface.h>
-#include <map_writer_plugin_interface.h>
+#include <pandora_geotiff/map_creator_interface.h>
+#include <pandora_geotiff/map_writer_plugin_interface.h>
 #include <nav_msgs/Path.h>
 
 #include <ros/ros.h>

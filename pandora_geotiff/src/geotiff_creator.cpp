@@ -36,7 +36,7 @@
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
 
-#include "geotiff_creator.h"
+#include "pandora_geotiff/geotiff_creator.h"
 //~ std::string homeFolderString("/home/konstantinos/Desktop/image.jpg");
 namespace pandora_geotiff{
 
