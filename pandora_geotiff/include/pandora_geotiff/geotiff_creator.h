@@ -40,8 +40,13 @@
 #define GeotiffCreator_H
 #include <QtGui>
 #include <QAction>
+#include <unistd.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <string>
 #include "ros/ros.h"
 #include "pandora_geotiff/map_creator_interface.h"
+
 
 
 namespace pandora_geotiff{
@@ -65,9 +70,9 @@ namespace pandora_geotiff{
     **/
     void createBackgroundIm();
     /**
-    *@brief save the GeotiffFinalGeotiffImg to the spacefied path
+    *@brief save the GeotiffFinalGeotiffImg to the specified path
     **/
-    void saveGeotiff(std::string homeFolderString = "~/Desktop/image.tiff");
+    void saveGeotiff(std::string homeFolderString = "/Desktop/image.tiff");
     /**
     *@brief sets the MissionName
     **/

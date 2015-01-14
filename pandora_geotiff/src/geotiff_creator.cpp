@@ -118,9 +118,14 @@ namespace pandora_geotiff{
   void GeotiffCreator::saveGeotiff(std::string homeFolderString)
   {
     ROS_INFO("Saving Geotiff...");
+    passwd* pw = getpwuid(getuid());
+    std::string path(pw->pw_dir);
+    path += homeFolderString;
     mapInitialized_ = false;
-    (*geotiffBackgroundIm_).save(homeFolderString.c_str());
-    ROS_INFO("Geotiff... was saved succesfully");
+    if((*geotiffBackgroundIm_).save(path.c_str())){
+       ROS_INFO("Geotiff... was saved succesfully");
+    }
+    else ROS_ERROR( "GEOTIFF DID NOT SAVE SUCCESFULLY (Check the path provided, and the user rights!)");
 
   }
   void GeotiffCreator::setMissionName(std::string missionName)
