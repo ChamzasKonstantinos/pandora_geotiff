@@ -72,7 +72,7 @@ namespace pandora_geotiff{
     /**
     *@brief save the GeotiffFinalGeotiffImg to the specified path
     **/
-    void saveGeotiff(std::string homeFolderString = "/Desktop/image.tiff");
+    void saveGeotiff(std::string homeFolderString = "/Desktop");
     /**
     *@brief sets the MissionName
     **/
@@ -132,8 +132,9 @@ namespace pandora_geotiff{
     QImage* geotiffBackgroundIm_; //!< The background Im
     QImage* geotiffMapIm_; //!< The MapIm
     QImage* geotiffFinalIm_; //!< The MapIm+BackgroundIm
-    QString missionName_; //!< The MissionName
-    QString missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
+    std::string missionName_; //!< The MissionName
+    std::string missionNamePrefix_; //!< The MissionNamePrefix Ex: "/RRL_2015_PANDORA_"
+    std::string missionNameExtention_; //!< The MissionNameExtention Ex: ".tiff"
     
     QApplication* app_;
     int fake_argc_;
@@ -163,10 +164,6 @@ namespace pandora_geotiff{
     int MAP_ORIENTATION_WIDTH;
     int MAP_ORIENTATION_LENGTH;
 
-
-
-   
-  
   };
 
 }// namespace pandora_geotiff

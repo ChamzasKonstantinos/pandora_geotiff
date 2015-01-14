@@ -46,7 +46,9 @@ MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator
       plugin_vector_[i]->draw(geotiffCreator);
     }
     ROS_ERROR("%s",missionName.c_str());
-    geotiffCreator->createBackgroundIm();   
+    geotiffCreator->setMissionName(missionName);
+    geotiffCreator->createBackgroundIm();
+    //The Default saving target is ~/Desktop    
     geotiffCreator->saveGeotiff();
 }
 

@@ -151,7 +151,7 @@ void ObjectsWriter::draw(MapWriterInterface *interface)
       ROS_WARN_NAMED("OBjectsWriter","ObjectWriter plugin not initilized or no data has been received /n ABORTING DRAWING..");
       return;
 
-  }
+    }
     ROS_INFO("DRAWING THE AWESOME OBJECTS");
     
     Eigen::Vector2f coords;

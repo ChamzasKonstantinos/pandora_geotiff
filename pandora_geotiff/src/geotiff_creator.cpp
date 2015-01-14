@@ -37,7 +37,6 @@
  *********************************************************************/
 
 #include "pandora_geotiff/geotiff_creator.h"
-//~ std::string homeFolderString("/home/konstantinos/Desktop/image.jpg");
 namespace pandora_geotiff{
 
   GeotiffCreator::GeotiffCreator()
@@ -49,8 +48,9 @@ namespace pandora_geotiff{
     geotiffBackgroundIm_ = NULL;
     CHECKER_SIZE = 50;
     geotiffFinalIm_ = NULL;
-    missionName_ = QString("TestMission");
-    missionNamePrefix_ = QString("/RRL_2015_PANDORA_");
+    missionName_ = std::string("TestMission");
+    missionNamePrefix_ = std::string("/RRL_2015_PANDORA_");
+    missionNameExtention_ = std::string(".tiff");
   // This parameters should be moved in a yaml file
     MAP_OFFSET = 4*CHECKER_SIZE;
     CHECKER_COLOR_LIGHT = "LIGHT_GREY";
@@ -120,7 +120,10 @@ namespace pandora_geotiff{
     ROS_INFO("Saving Geotiff...");
     passwd* pw = getpwuid(getuid());
     std::string path(pw->pw_dir);
-    path += homeFolderString;
+    path.append(homeFolderString);
+    path.append(missionNamePrefix_);
+    path.append(missionName_);
+    path.append(missionNameExtention_);
     mapInitialized_ = false;
     if((*geotiffBackgroundIm_).save(path.c_str())){
        ROS_INFO("Geotiff... was saved succesfully");
@@ -130,7 +133,7 @@ namespace pandora_geotiff{
   }
   void GeotiffCreator::setMissionName(std::string missionName)
   {
-    missionName_= QString(missionName.c_str());
+    missionName_= missionName;
   }
   void GeotiffCreator::drawCheckers (const int& checkerSize,const std::string& colorD,const std::string& colorL, QPainter* geotiffPainter)
   {
@@ -164,9 +167,9 @@ namespace pandora_geotiff{
 
     QPointF filenamePoint(coords.x() ,coords.y());
 
-    QString filenameString(missionNamePrefix_);
-    filenameString.append(missionName_);
-    filenameString.append(".tiff");
+    QString filenameString(QString(missionNamePrefix_.c_str()));
+    filenameString.append(QString(missionName_.c_str()));
+    filenameString.append(QString(missionNameExtention_.c_str()));
 
     geotiffPainter->drawText(filenamePoint, filenameString);
     ROS_INFO("MissionName was drawed succesfully");
@@ -379,8 +382,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
         Qt::AlignCenter,QString::fromStdString(txt));
     }
 
-    else if (shape =="ARROW")
-    {
+    else if (shape =="ARROW"){
       QPoint points[4];
       points[0] = QPoint(pixelCoords.x(),pixelCoords.y()-3*rSize);
       points[1] = QPoint(pixelCoords.x()+rSize, pixelCoords.y() +2*rSize);
@@ -389,9 +391,7 @@ void GeotiffCreator::drawMapScale(const Eigen::Vector2f& coords,const std::strin
       objectPainter->drawPolygon(points, 4);
     }
 
-    else
-    {
-
+    else{
       ROS_WARN("THIS SHAPE is not supported");
     }
 
