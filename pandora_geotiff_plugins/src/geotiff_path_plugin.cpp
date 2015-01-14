@@ -88,8 +88,11 @@ void PathWriter::initialize(const std::string& name)
   ros::NodeHandle plugin_nh("~/" + name);
   std::string path_topic_name;
 
-  plugin_nh.param("robot_trajectory_topic", path_topic_name, std::string("/robot_trajectory"));
-
+  plugin_nh.param("/pandora_geotiff_node/published_topic_names/trajectory", path_topic_name, std::string("/arobot_trajectory"));
+  plugin_nh.param("/pandora_geotiff_node/arrow_params/color",ARROW_COLOR,std::string("DIAMOND"));
+  plugin_nh.param("/pandora_geotiff_node/arrow_params/size",ARROW_SIZE,20);
+  plugin_nh.param("/pandora_geotiff_node/path_params/color",PATH_COLOR,std::string("SOLID_ORANGE"));
+  plugin_nh.param("/pandora_geotiff_node/path_params/width",PATH_WIDTH,10);
   path_sub = plugin_nh.subscribe(path_topic_name , 1000, &PathWriter::getRobotTrajectoryData,this);
   initialized_ = true;
   this->name_ = name;

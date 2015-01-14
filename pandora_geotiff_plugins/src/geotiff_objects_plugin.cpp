@@ -1,3 +1,41 @@
+/*********************************************************************
+ *
+ * Software License Agreement (BSD License)
+ *
+ *  Copyright (c) 2014, P.A.N.D.O.R.A. Team.
+ *  All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions
+ *  are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above
+ *     copyright notice, this list of conditions and the following
+ *     disclaimer in the documentation and/or other materials provided
+ *     with the distribution.
+ *   * Neither the name of the P.A.N.D.O.R.A. Team nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ *  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ *  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ *  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ *  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *  POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Authors:
+ *   Chamzas Konstantinos <chamzask@gmail.com>
+ *********************************************************************/
+
 #include <pandora_geotiff/map_creator_interface.h>
 #include <pandora_geotiff/map_writer_plugin_interface.h>
 #include <pandora_data_fusion_msgs/GeotiffSrv.h>
@@ -11,16 +49,14 @@ std::string homeFolderString("/home/konstantinos");
 namespace pandora_geotiff_plugins
 {
 
-using namespace pandora_geotiff;
-
-class ObjectsWriter : public MapWriterPluginInterface
+class ObjectsWriter : public pandora_geotiff::MapWriterPluginInterface
 {
 public:
   ObjectsWriter();
   virtual ~ObjectsWriter();
 
   virtual void initialize(const std::string& name);
-  virtual void draw(MapWriterInterface *interface);
+  virtual void draw(pandora_geotiff::MapWriterInterface *interface);
   void getObjectsData();
   std::string getDateAndTime();
   std::string getQrTime(time_t qrTime);
@@ -29,6 +65,7 @@ public:
 protected:
   ros::NodeHandle nh_;
   ros::ServiceClient service_client_;
+  std::string service_name_;
 
   bool initialized_;
   bool gotData_;
@@ -55,9 +92,7 @@ private:
 };
 
 ObjectsWriter::ObjectsWriter()
-    : initialized_(false),gotData_(false),VICTIMS_COLOR("SOLID_RED"),HAZMATS_COLOR("SOLID_ORANGE"),QRS_COLOR("SOLID_BLUE"),
-        VICTIMS_SHAPE("CIRCLE"),HAZMATS_SHAPE("DIAMOND"),QRS_SHAPE("CIRCLE"),TXT_COLOR("WHITE_MAX"),
-        VICTIMS_SIZE(35),HAZMATS_SIZE(42),QRS_SIZE(35)
+    : initialized_(false),gotData_(false)
 {}
 
 ObjectsWriter::~ObjectsWriter()
@@ -66,9 +101,19 @@ ObjectsWriter::~ObjectsWriter()
 void ObjectsWriter::initialize(const std::string& name)
 {
   ros::NodeHandle plugin_nh("~/" + name);
-  std::string service_name_;
-
-  plugin_nh.param("service_name", service_name_, std::string("data_fusion_geotiff"));
+  
+  plugin_nh.param("/pandora_geotiff_node/service_topic_names/data_fusion_objects", service_name_, std::string("data_fusion_geotiff"));
+  plugin_nh.param("/pandora_geotiff_node/hazmat_params/shape",HAZMATS_SHAPE,std::string("DIAMOND"));
+  plugin_nh.param("/pandora_geotiff_node/hazmat_params/color",HAZMATS_COLOR,std::string("SOLID_ORANGE"));
+  plugin_nh.param("/pandora_geotiff_node/hazmat_params/size",HAZMATS_SIZE,1);
+  plugin_nh.param("/pandora_geotiff_node/qr_params/shape",QRS_SHAPE,std::string("DIAMOND"));
+  plugin_nh.param("/pandora_geotiff_node/qr_params/color",QRS_COLOR,std::string("SOLID_ORANGE"));
+  plugin_nh.param("/pandora_geotiff_node/qr_params/size",QRS_SIZE,1);
+  plugin_nh.param("/pandora_geotiff_node/victim_params/shape",VICTIMS_SHAPE,std::string("DIAMOND"));
+  plugin_nh.param("/pandora_geotiff_node/victim_params/color",VICTIMS_COLOR,std::string("SOLID_ORANGE"));
+  plugin_nh.param("/pandora_geotiff_node/victim_params/size",VICTIMS_SIZE,1);
+  plugin_nh.param("/pandora_geotiff_node/victim_params/size",VICTIMS_SIZE,1);
+  plugin_nh.param("/pandora_geotiff_node/general_objects_params/txt_color",TXT_COLOR,std::string("SOLID_ORANGE"));
 
   service_client_ = nh_.serviceClient<pandora_data_fusion_msgs::GeotiffSrv>(service_name_);
 
@@ -142,7 +187,7 @@ void ObjectsWriter::getObjectsData()
   }
 
 
-void ObjectsWriter::draw(MapWriterInterface *interface)
+void ObjectsWriter::draw(pandora_geotiff::MapWriterInterface *interface)
 {
     this->getObjectsData();
 

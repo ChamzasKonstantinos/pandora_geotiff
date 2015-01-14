@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 
 <launch>
-  
-  
-    
     
   <node pkg="pandora_geotiff" type="pandora_geotiff_node" name="pandora_geotiff_node" output="screen" >
     
