@@ -52,30 +52,32 @@
 
 #include "pandora_geotiff/SaveMission.h"
 #include "pandora_geotiff/geotiff_creator.h"
-#include <pandora_geotiff/map_writer_plugin_interface.h>
+#include "pandora_geotiff/map_writer_plugin_interface.h"
+#include "pandora_geotiff/qr_csv_creator.h"
 
-
-class MapGenerator
+namespace pandora_geotiff
 {
-  private:  
   
-    pandora_geotiff::GeotiffCreator* geotiffCreator;
-  
-    std::string p_plugin_list_;
-    ros::NodeHandle pn_;
-    ros::ServiceServer save_mission_service;
-    std::vector<boost::shared_ptr<pandora_geotiff::MapWriterPluginInterface> > plugin_vector_;
-    pluginlib::ClassLoader<pandora_geotiff::MapWriterPluginInterface>* plugin_loader_;
+  class MapGenerator{
+    private:  
     
+      GeotiffCreator* geotiffCreator;
+      QrCsvCreator* qrCsvCreator; 
+      std::string p_plugin_list_;
+      ros::NodeHandle pn_;
+      ros::ServiceServer save_mission_service;
+      std::vector<boost::shared_ptr<MapWriterPluginInterface> > plugin_vector_;
+      pluginlib::ClassLoader<MapWriterPluginInterface>* plugin_loader_;
+      
+      
+    public:
+      MapGenerator();
+      ~MapGenerator();
     
-  public:
-    MapGenerator();
-    ~MapGenerator();
+      void writeGeotiff(const std::string& missionName);
+      bool saveGeotiff(SaveMission::Request& req ,
+        SaveMission::Response& res );
+  };
   
-    void writeGeotiff(const std::string& missionName);
-    bool saveGeotiff(pandora_geotiff::SaveMission::Request& req ,
-      pandora_geotiff::SaveMission::Response& res );
-};
-
-  
+}//namespace pandora_geotiff
 #endif

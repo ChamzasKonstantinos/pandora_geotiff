@@ -35,7 +35,14 @@
  * Authors:
  *   Chamzas Konstantinos <chamzask@gmail.com>
  *********************************************************************/
+
+
+#ifndef Qr_Csv_Creator_H
+#define Qr_Csv_Creator_H
+
 #include <stdlib.h>
+#include <ros/ros.h>
+#include <pwd.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -47,19 +54,19 @@ namespace pandora_geotiff{
   
   public:
   
-     QrCsvCreator();
-     void generateQrCsv(std::string missionName);
+   QrCsvCreator();
+   void generateQrCsv(std::string missionName);
      
   private:
-
+   
     bool gotData_;
     std::string missionNamePrefix_;
     std::string getDateAndTime();
     std::string getQrTime(time_t qrTime);
-    std::vector<pandora_data_fusion_msgs::QrNotificationMsgs> Qrs;
-    
-    }
+    std::vector<pandora_data_fusion_msgs::QrNotificationMsg> qrs_;
+    void getQrsData();
+    };
 }
-
+#endif
 
 

@@ -39,11 +39,12 @@
 #include "pandora_geotiff/map_generator.h"
 
 
-int main(int argc, char **argv){
+  int main(int argc, char **argv){
+    
+    ros::init(argc, argv, "pandora_geotiff_node");
+    ROS_INFO("PANDORA_GEOTIFF_NODE_STARTED");
+    pandora_geotiff::MapGenerator gc;
+    ros::spin();
   
-  ros::init(argc, argv, "pandora_geotiff_node");
-  ROS_INFO("PANDORA_GEOTIFF_NODE_STARTED");
-  MapGenerator gc;
-  ros::spin();
-
-}
+  }
+//namespace pandora_geotid

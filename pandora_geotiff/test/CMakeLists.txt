@@ -19,7 +19,7 @@ target_link_libraries(geotiff_creator_test
   ${catkin_LIBRARIES}
   ${pandora_testing_tools_LIBRARIES}
   geotiff_creator
-  #~ gtest_main
+  gtest_main
   )
 
 
