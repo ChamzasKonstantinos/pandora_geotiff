@@ -48,24 +48,36 @@ namespace pandora_geotiff{
     geotiffBackgroundIm_ = NULL;
     CHECKER_SIZE = 50;
     geotiffFinalIm_ = NULL;
+
+    // This parameters should be moved in a yaml file
     missionName_ = std::string("TestMission");
     missionNamePrefix_ = std::string("/RRL_2015_PANDORA_");
     missionNameExtention_ = std::string(".tiff");
-  // This parameters should be moved in a yaml file
-    MAP_OFFSET = 4*CHECKER_SIZE;
     CHECKER_COLOR_LIGHT = "LIGHT_GREY";
     CHECKER_COLOR_DARK =  "DARK_GREY";
-    MISSION_NAME_COORDS =  Eigen::Vector2f(CHECKER_SIZE/2 ,CHECKER_SIZE/2);
     MISSION_NAME_COLOR = "DARK_BLUE_F";
-    MISSION_NAME_WIDTH = 2;
-    MAP_SCALE_COORDS = Eigen::Vector2f(CHECKER_SIZE/2, CHECKER_SIZE*2);
     MAP_SCALE_COLOR = "DARK_BLUE_M";
-    MAP_SCALE_WIDTH = 2;
-    MAP_ORIENTATION_COORDS =Eigen::Vector2f(CHECKER_SIZE*2, CHECKER_SIZE*2);
     MAP_ORIENTATION_COLOR = "DARK_BLUE_M";
+    MISSION_NAME_WIDTH = 2;
+    MAP_SCALE_WIDTH = 2;
     MAP_ORIENTATION_WIDTH = 2 ;
+
+    
+    //~ plugin_nh.param("/pandora_geotiff_node/published_topic_names/map", missionName_, std::string("/slam/map"));
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_bot_thres",MAP_BOT_THRES,0);
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_top_thres",MAP_TOP_THRES,0);
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_color",MAP_COLOR, std::string("WHITE_MAX"));
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_bot_thres",WALL_BOT_THRES,0);
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_top_thres",WALL_TOP_THRES,0);
+    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_color",WALL_COLOR, std::string("SOLID_RED"));
+    //~ //this parameters must be set from the map plugin tha will always be called first
+   
+    MAP_OFFSET = 4*CHECKER_SIZE;
+    MISSION_NAME_COORDS =  Eigen::Vector2f(CHECKER_SIZE/2 ,CHECKER_SIZE/2);
+    MAP_SCALE_COORDS = Eigen::Vector2f(CHECKER_SIZE/2, CHECKER_SIZE*2);
+    MAP_ORIENTATION_COORDS =Eigen::Vector2f(CHECKER_SIZE*2, CHECKER_SIZE*2);
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
-  //this parameters must be set from the map plugin tha will always be called first
+
     
     mapXoffset_ = 0;
     mapYoffset_ = 0;

@@ -38,7 +38,6 @@
 #include <pandora_geotiff/map_creator_interface.h>
 #include <pandora_geotiff/map_writer_plugin_interface.h>
 #include <nav_msgs/Path.h>
-
 #include <ros/ros.h>
 #include <pluginlib/class_loader.h>
 
@@ -46,16 +45,16 @@
 namespace pandora_geotiff_plugins
 {
 
-using namespace pandora_geotiff;
 
-class PathWriter : public MapWriterPluginInterface
+
+class PathWriter : public pandora_geotiff::MapWriterPluginInterface
 {
   public:
     PathWriter();
     virtual ~PathWriter();
   
     virtual void initialize(const std::string& name);
-    virtual void draw(MapWriterInterface *interface);
+    virtual void draw(pandora_geotiff::MapWriterInterface *interface);
     void getRobotTrajectoryData(nav_msgs::Path robotPath);
   
   protected:
@@ -88,7 +87,7 @@ void PathWriter::initialize(const std::string& name)
   ros::NodeHandle plugin_nh("~/" + name);
   std::string path_topic_name;
 
-  plugin_nh.param("/pandora_geotiff_node/published_topic_names/trajectory", path_topic_name, std::string("/arobot_trajectory"));
+  plugin_nh.param("/pandora_geotiff_node/published_topic_names/trajectory", path_topic_name, std::string("/robot_trajectory"));
   plugin_nh.param("/pandora_geotiff_node/arrow_params/color",ARROW_COLOR,std::string("DIAMOND"));
   plugin_nh.param("/pandora_geotiff_node/arrow_params/size",ARROW_SIZE,20);
   plugin_nh.param("/pandora_geotiff_node/path_params/color",PATH_COLOR,std::string("SOLID_ORANGE"));
@@ -107,7 +106,7 @@ void PathWriter::getRobotTrajectoryData(nav_msgs::Path robotPath)
     }
 
   
-void PathWriter::draw(MapWriterInterface *interface)
+void PathWriter::draw(pandora_geotiff::MapWriterInterface *interface)
 {
     if(!initialized_||!gotData)
     {

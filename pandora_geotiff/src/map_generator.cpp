@@ -83,7 +83,6 @@ MapGenerator::MapGenerator(): geotiffCreator(new pandora_geotiff::GeotiffCreator
     for (size_t i = 0; i < plugin_vector_.size(); ++i){
       plugin_vector_[i]->draw(geotiffCreator);
     }
-    ROS_ERROR("%s",missionName.c_str());
     geotiffCreator->setMissionName(missionName);
     geotiffCreator->createBackgroundIm();
     //The Default saving target is ~/Desktop    

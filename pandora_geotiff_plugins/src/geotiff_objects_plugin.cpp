@@ -44,8 +44,6 @@
 #include <tf/transform_listener.h>
 #include <pluginlib/class_loader.h>
 
-std::string homeFolderString("/home/konstantinos");
-
 namespace pandora_geotiff_plugins
 {
 
@@ -58,10 +56,7 @@ public:
   virtual void initialize(const std::string& name);
   virtual void draw(pandora_geotiff::MapWriterInterface *interface);
   void getObjectsData();
-  std::string getDateAndTime();
-  std::string getQrTime(time_t qrTime);
-  void generateQrCsv(std::string missionName);
-
+ 
 protected:
   ros::NodeHandle nh_;
   ros::ServiceClient service_client_;
@@ -122,51 +117,6 @@ void ObjectsWriter::initialize(const std::string& name)
   ROS_INFO_NAMED(name_, "Successfully initialized pandora_geotiff  ObjectsWriter plugin %s.", name_.c_str());
 }
 
-std::string ObjectsWriter::getDateAndTime(){
-
-  time_t t = time(0); // get time now
-  struct tm * now = localtime( & t );
-  char buf[20];
-  std::stringstream ss;
-  
-  strftime(buf, sizeof(buf), "%F", now);
-  
-  ss << buf << "; ";
-  
-  strftime(buf, sizeof(buf), "%T", now);
-  
-  ss << buf;
-  
-  std::string str = ss.str();
-
-  return str;
-
-}
-
-std::string ObjectsWriter::getQrTime(time_t qrTime){
-  
-  struct tm * now = localtime( & qrTime );
-  char buf[10];
-  std::stringstream ss;
-  strftime(buf, sizeof(buf), "%T", now);
-  ss << buf;
-  
-  std::string str = ss.str();
-
-  return str;
-}
-
-
-void ObjectsWriter::generateQrCsv(std::string missionName){
-
-  std::string filenameString("/RC_2014_PANDORA_");
-  filenameString.append(missionName);
-  filenameString.append("_qr.csv");
-  
-  std::string filepath = homeFolderString;
-  filepath = filepath.append("/Desktop/");
-  filepath.append(filenameString);
-}
 
 void ObjectsWriter::getObjectsData()
 {
@@ -198,52 +148,88 @@ void ObjectsWriter::draw(pandora_geotiff::MapWriterInterface *interface)
 
     }
     ROS_INFO("DRAWING THE AWESOME OBJECTS");
-    
     Eigen::Vector2f coords;
     std::string txt;
 
     tf::TransformListener listener;
     tf::StampedTransform transform;
     tfScalar pitch, roll, yaw;
-     
-    try{
+    tf::Vector3 origin ;
+    float x,y;
+    
+    for (int i = 0 ; i< qrs_.size(); i++){
 
-      listener.waitForTransform("/map", victims_[0].header.frame_id ,victims_[0].header.stamp, ros::Duration(1));
-      listener.lookupTransform("/map", victims_[0].header.frame_id , victims_[0].header.stamp, transform);
-    }
-    catch (tf::TransformException &ex) {
-      ROS_ERROR("%s",ex.what());
-      ros::Duration(1.0).sleep();
-    }
-    transform.getBasis().getRPY(roll, pitch, yaw);
-    tf::Vector3 origin = transform.getOrigin();
-    for (int i = 0 ; i< qrs_.size(); i++)
-    {
-      float x  =  qrs_[i].pose.position.x + origin.x();
-      float y  = qrs_[i].pose.position.y + origin.y();
+      //Get Tf
+      try{
+  
+        listener.waitForTransform("/map", qrs_[i].header.frame_id ,qrs_[i].header.stamp, ros::Duration(1));
+        listener.lookupTransform("/map", qrs_[i].header.frame_id , qrs_[i].header.stamp, transform);
+      }
+      catch (tf::TransformException &ex) {
+        ROS_ERROR("%s",ex.what());
+        ros::Duration(1.0).sleep();
+      }
+      //Get  origin and roll , pitch, yaw
+      transform.getBasis().getRPY(roll, pitch, yaw);
+      origin = transform.getOrigin();
+      //Add The origin vector
+      x  =  qrs_[i].pose.position.x + origin.x();
+      y  = qrs_[i].pose.position.y + origin.y();
+      //Rotate acording to yaw and  pitch
       coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
       txt = boost::lexical_cast<std::string>(i+1);
      
      interface->drawObjectOfInterest(coords,QRS_COLOR ,TXT_COLOR, QRS_SHAPE,txt,QRS_SIZE);
     }
 
-    for (int i = 0 ; i< victims_.size(); i++)
-    {
-      float x  = victims_[i].pose.position.x + origin.x();
-      float y  = victims_[i].pose.position.y + origin.y();
+    for (int i = 0 ; i< victims_.size(); i++){
+
+       //Get Tf
+      try{
+  
+        listener.waitForTransform("/map", victims_[i].header.frame_id ,victims_[i].header.stamp, ros::Duration(1));
+        listener.lookupTransform("/map", victims_[i].header.frame_id , victims_[i].header.stamp, transform);
+      }
+      catch (tf::TransformException &ex) {
+        ROS_ERROR("%s",ex.what());
+        ros::Duration(1.0).sleep();
+      }
+      //Get  origin and roll , pitch, yaw
+      transform.getBasis().getRPY(roll, pitch, yaw);
+      origin = transform.getOrigin();
+
+      //Add The origin vector
+      x  = victims_[i].pose.position.x + origin.x();
+      y  = victims_[i].pose.position.y + origin.y();
+      //Rotate acording to yaw and  pitch
       coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
       txt = boost::lexical_cast<std::string>(i+1);
-     
+
+      
      interface->drawObjectOfInterest(coords,VICTIMS_COLOR ,TXT_COLOR, VICTIMS_SHAPE,txt,VICTIMS_SIZE);
     }
     
-    for (int i = 0 ; i< hazmats_.size(); i++)
-    {
-      
-      float x  = hazmats_[i].pose.position.x + origin.x();
-      float y  = hazmats_[i].pose.position.y + origin.y();
+    for (int i = 0 ; i< hazmats_.size(); i++){
+    //Get Tf
+    try{
+  
+        listener.waitForTransform("/map", hazmats_[i].header.frame_id ,hazmats_[i].header.stamp, ros::Duration(1));
+        listener.lookupTransform("/map", hazmats_[i].header.frame_id , hazmats_[i].header.stamp, transform);
+      }
+      catch (tf::TransformException &ex) {
+        ROS_ERROR("%s",ex.what());
+        ros::Duration(1.0).sleep();
+      }
+     //Get  origin and roll , pitch, yaw
+      transform.getBasis().getRPY(roll, pitch, yaw);
+      origin = transform.getOrigin();
+
+      //Add The origin vector
+      x  = hazmats_[i].pose.position.x + origin.x();
+      y  = hazmats_[i].pose.position.y + origin.y();
+      //Rotate acording to yaw and  pitch
       coords = Eigen::Vector2f(x*cos(yaw) + y*sin(yaw),y*cos(yaw) +x*sin(yaw));
-     txt = boost::lexical_cast<std::string>(i+1);
+      txt = boost::lexical_cast<std::string>(i+1);
      
      interface->drawObjectOfInterest(coords,HAZMATS_COLOR ,TXT_COLOR, HAZMATS_SHAPE,txt,HAZMATS_SIZE);
     }
