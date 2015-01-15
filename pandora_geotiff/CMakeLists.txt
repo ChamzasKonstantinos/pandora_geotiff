@@ -43,11 +43,16 @@ include_directories(
 
 add_library(geotiff_creator src/geotiff_creator.cpp)
 target_link_libraries(geotiff_creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies(geotiff_creator  ${catkin_EXPORTED_TARGETS})
 
 add_library( map_generator src/map_generator.cpp)
 target_link_libraries(map_generator  geotiff_creator ${catkin_LIBRARIES} ${QT_LIBRARIES})
-add_dependencies( map_generator   geotiff_creator ${catkin_EXPORTED_TARGETS})
+add_dependencies( map_generator ${${PROJECT_NAME}_EXPORTED_TARGETS})
+
+
+add_library(qr_csv_creator src/qr_csv_creator.cpp)
+target_link_libraries(qr_csv_creator  ${catkin_LIBRARIES})
+add_dependencies(qr_csv_creator ${catkin_EXPORTED_TARGETS})
+
 
 add_executable(pandora_geotiff_node src/pandora_geotiff_node.cpp)
 target_link_libraries(pandora_geotiff_node
@@ -55,10 +60,6 @@ target_link_libraries(pandora_geotiff_node
       map_generator
       geotiff_creator
       )
-
-add_executable(data_fusion_mock test/data_fusion_mock_srv.cpp)
-target_link_libraries(data_fusion_mock ${catkin_LIBRARIES})
-
 
 if(CATKIN_ENABLE_TESTING)
   add_subdirectory(test)

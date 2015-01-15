@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<package>
+<package format="2">
   <name>pandora_geotiff</name>
   <version>0.0.0</version>
   <description>Contains pandora geotiff  packages</description>
@@ -9,27 +8,23 @@
   <license>BSD</license>
   
   
-  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_geotiff/issues</url>
-  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_geotiff</url>
+  <url type="bugtracker">https://github.com/pandora-auth-ros-pkg/pandora_visualization/issues</url>
+  <url type="repository">https://github.com/pandora-auth-ros-pkg/pandora_visualization.git</url>
 
-  <author>Dimitrios Vitsios</author>
   <author>Chamzas Konstantinos</author>
   
   <buildtool_depend>catkin</buildtool_depend>
   
-  <buildtool_depend>catkin</buildtool_depend>
   <build_depend>cmake_modules</build_depend>
-  <build_depend>pluginlib</build_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>std_msgs</build_depend>
+  <build_depend>roslint</build_depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>std_msgs</depend>
   <build_depend>libqt4-dev</build_depend>
-  <build_depend>tf</build_depend>
-  <build_depend>pandora_data_fusion_msgs</build_depend>
-  
-  <run_depend>pluginlib</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>libqt4-dev</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>pandora_data_fusion_msgs</run_depend>
+  <exec_depend>libqt4</exec_depend>
+  <depend>tf</depend>
+  <depend>pandora_data_fusion_msgs</depend>
+
+  <test_depend>rosunit</test_depend>
+  <test_depend>rostest</test_depend>
 </package>

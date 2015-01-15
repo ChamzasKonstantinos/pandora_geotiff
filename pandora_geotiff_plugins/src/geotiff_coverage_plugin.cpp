@@ -79,7 +79,7 @@ namespace pandora_geotiff_plugins{
   
     ros::NodeHandle plugin_nh("~/" + name);
     plugin_nh.param("pandora_geotiff_node/published_topic_names/coverage_map", coverage_topic_name_,
-      std::string("/data_fusion/sensor_coverage/coverage_map"));
+      std::string("/data_fusion/sensor_coverage/kinect_space"));
     plugin_nh.param("pandora_geotiff_node/coverage_map_params/color",COVERAGE_COLOR, std::string("LIGHT_GREEN_MAX"));
     plugin_nh.param("pandora_geotiff_node/coverage_map_params/bot_thres",COV_BOT_THRES,-5);
     plugin_nh.param("pandora_geotiff_node/coverage_map_params/top_thres",COV_TOP_THRES,100);

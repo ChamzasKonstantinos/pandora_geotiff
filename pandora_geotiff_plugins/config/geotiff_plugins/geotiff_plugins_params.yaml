@@ -1,6 +1,6 @@
 
 published_topic_names: 
-  coverage_map: "/data_fusion/sensor_coverage/coverage_map"
+  coverage_map: "/data_fusion/sensor_coverage/kinect_space"
   map: "/slam/map"
   trajectory: "/robot_trajectory"
 

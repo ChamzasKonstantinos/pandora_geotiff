@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys
 import rospy
 from pandora_geotiff.srv import *

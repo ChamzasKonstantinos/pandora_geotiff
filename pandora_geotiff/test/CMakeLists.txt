@@ -1,36 +1,25 @@
-find_package(catkin REQUIRED COMPONENTS
-  rostest
-  roslib 
-  map_server
-  )
+#~ find_package(roslib REQUIRED)
+#~ find_package(rostest REQUIRED)
+find_package(pandora_testing_tools REQUIRED)
 
-find_package(PkgConfig)
-pkg_check_modules(NEW_YAMLCPP yaml-cpp>=0.5)
-if(NEW_YAMLCPP_FOUND)
-  add_definitions(-DHAVE_NEW_YAMLCPP)
-endif(NEW_YAMLCPP_FOUND)
+include_directories(
+  ${pandora_testing_tools_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS})
 
-link_directories(${catkin_LIBRARY_DIRS})
-include_directories(map_loader/include ${catkin_INCLUDE_DIRS})
+add_executable(data_fusion_mock EXCLUDE_FROM_ALL functional/data_fusion_mock_srv.cpp)
+target_link_libraries(data_fusion_mock ${catkin_LIBRARIES})
+add_dependencies(data_fusion_mock ${catkin_EXPORTED_TARGETS})
 
-########################  map loader  ###############################
-
-add_library(map_loader map_loader/src/map_loader.cpp)
-target_link_libraries(map_loader 
-  image_loader
-  yaml-cpp
-  ${catkin_LIBRARIES}
-  )
 ########################  Unit Tests  ###############################
 
 ########################  geotiff_creator  ####################################
 
 catkin_add_gtest(geotiff_creator_test unit/geotiff_creator_test.cpp)
 target_link_libraries(geotiff_creator_test 
-  ${catkin_LIBRARIES} 
+  ${catkin_LIBRARIES}
+  ${pandora_testing_tools_LIBRARIES}
   geotiff_creator
-  map_loader
-  gtest_main
+  #~ gtest_main
   )
 
 

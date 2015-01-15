@@ -49,7 +49,7 @@ namespace pandora_geotiff{
     CHECKER_SIZE = 50;
     geotiffFinalIm_ = NULL;
 
-    // This parameters should be moved in a yaml file
+    // This parameters should be moved in a yaml file( in a later Version))
     missionName_ = std::string("TestMission");
     missionNamePrefix_ = std::string("/RRL_2015_PANDORA_");
     missionNameExtention_ = std::string(".tiff");
@@ -61,16 +61,6 @@ namespace pandora_geotiff{
     MISSION_NAME_WIDTH = 2;
     MAP_SCALE_WIDTH = 2;
     MAP_ORIENTATION_WIDTH = 2 ;
-
-    
-    //~ plugin_nh.param("/pandora_geotiff_node/published_topic_names/map", missionName_, std::string("/slam/map"));
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_bot_thres",MAP_BOT_THRES,0);
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_top_thres",MAP_TOP_THRES,0);
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/explored_color",MAP_COLOR, std::string("WHITE_MAX"));
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_bot_thres",WALL_BOT_THRES,0);
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_top_thres",WALL_TOP_THRES,0);
-    //~ plugin_nh.param("/pandora_geotiff_node/explored_map_params/wall_color",WALL_COLOR, std::string("SOLID_RED"));
-    //~ //this parameters must be set from the map plugin tha will always be called first
    
     MAP_OFFSET = 4*CHECKER_SIZE;
     MISSION_NAME_COORDS =  Eigen::Vector2f(CHECKER_SIZE/2 ,CHECKER_SIZE/2);
@@ -78,7 +68,7 @@ namespace pandora_geotiff{
     MAP_ORIENTATION_COORDS =Eigen::Vector2f(CHECKER_SIZE*2, CHECKER_SIZE*2);
     MAP_ORIENTATION_LENGTH = CHECKER_SIZE;
 
-    
+    //This parameters are given theris real values in a different state    
     mapXoffset_ = 0;
     mapYoffset_ = 0;
     trimmingXoffset_ = 0;
@@ -95,14 +85,14 @@ namespace pandora_geotiff{
     colorMap["BLACK"]           = QColor(190,190,191);
     colorMap["YELLOW"]          = QColor(255, 200, 0);
     colorMap["WHITE_MAX"]       = QColor(255, 255, 255);
-    colorMap["WHITE_MIN"]       = QColor(128, 128, 128);
-    colorMap["LIGHT_GREEN_MAX"] = QColor(180, 230, 180);
-    colorMap["LIGHT_GREEN_MIN"] = QColor(130, 230, 130);
+    colorMap["WHITE_MIN"]       = QColor(128, 128, 128,150);
+    colorMap["LIGHT_GREEN_MAX"] = QColor(180, 230, 180,100);
+    colorMap["LIGHT_GREEN_MIN"] = QColor(130, 230, 130,100);
     colorMap["SOLID_RED"]       = QColor(240, 10, 10);
     colorMap["YELLOW"]          = QColor(255, 200, 0);
     colorMap["SOLID_ORANGE"]    = QColor(255, 100, 30);
     colorMap["SOLID_BLUE"]      = QColor(10, 10, 240);
-    colorMap["MAGENTA"]         = QColor(120, 0, 140);
+    colorMap["MAGENTA"]         = QColor(120, 0, 140,100);
 
   }
   //THIS FUNCTION MUST ONLY BE CALLED AFTER geotiffMapIm is initialized!
